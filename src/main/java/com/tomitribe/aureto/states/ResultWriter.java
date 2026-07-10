@@ -24,7 +24,7 @@ import lombok.Builder;
  * @param arguments input to the writer task; a JSON object or a JSONata string evaluating to one
  * @see <a href="https://states-language.net/spec.html#writing-results">Writing Results</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record ResultWriter(@JsonbProperty("Resource") String resource,
                            @JsonbProperty("Arguments") JsonValue arguments) {
     public ResultWriter {

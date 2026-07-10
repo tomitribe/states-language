@@ -13,7 +13,6 @@ import com.tomitribe.aureto.states.test.JsonAsserts;
 import jakarta.json.Json;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +41,7 @@ class DistributeReleaseTest {
                 .build();
 
         final Catcher markFailed = Catcher.builder()
-                .errorEquals(List.of("States.ALL"))
+                .error("States.ALL")
                 .output(Json.createValue(CATCH_ERROR))
                 .next("MarkFailed")
                 .build();
@@ -50,20 +49,20 @@ class DistributeReleaseTest {
         final TaskState weaveRelease = TaskState.builder()
                 .resource(FUNCTION + "WeaveRelease")
                 .arguments(Json.createValue(ENVELOPE))
-                .retry(List.of(Retrier.builder()
-                        .errorEquals(List.of("States.Timeout"))
+                .retrier(Retrier.builder()
+                        .error("States.Timeout")
                         .intervalSeconds(3)
                         .maxAttempts(2)
                         .backoffRate(2.0)
-                        .build()))
-                .catchers(List.of(markFailed))
+                        .build())
+                .catcher(markFailed)
                 .next("PublishRelease")
                 .build();
 
         final TaskState publishRelease = TaskState.builder()
                 .resource(FUNCTION + "PublishRelease")
                 .arguments(Json.createValue(ENVELOPE))
-                .catchers(List.of(markFailed))
+                .catcher(markFailed)
                 .end(true)
                 .build();
 

@@ -28,7 +28,7 @@ import java.util.Map;
  * @param states the states of the processor, keyed by state name
  * @see <a href="https://states-language.net/spec.html#map-state-itemprocessor-definition">Map State ItemProcessor definition</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record ItemProcessor(@JsonbProperty("ProcessorConfig") JsonObject processorConfig,
                             @JsonbProperty("StartAt") String startAt,
                             @JsonbProperty("States") Map<String, State> states) {

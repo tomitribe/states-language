@@ -29,7 +29,7 @@ import java.util.Map;
  * @param states the states of the machine, keyed by state name (80 character maximum, unique)
  * @see <a href="https://states-language.net/spec.html#toplevelfields">Top-level fields</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record StateMachine(@JsonbProperty("Comment") String comment,
                            @JsonbProperty("QueryLanguage") String queryLanguage,
                            @JsonbProperty("Version") String version,

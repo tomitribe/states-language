@@ -17,14 +17,21 @@ import org.reflections.scanners.SubTypesScanner;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Sweeps every class in the model and enforces the structural conventions:
- * immutable records built exclusively through Lombok builders.
+ * immutable records built exclusively through Lombok builders, builder
+ * classes named Foo.Builder, and List fields annotated with @Singular so
+ * entries can be added one at a time.
  */
 public class VerifyConventionsTest {
 
@@ -90,5 +97,46 @@ public class VerifyConventionsTest {
     @MethodSource("classes")
     public void isRecord(final Class<?> clazz) throws Exception {
         assertTrue(clazz.isRecord(), clazz.getSimpleName() + " should be a record");
+    }
+
+    /**
+     * Builder class is a nested class named Foo.Builder
+     */
+    @ParameterizedTest(name = "builderIsNamedBuilder - {0}")
+    @MethodSource("classes")
+    public void builderIsNamedBuilder(final Class<?> clazz) throws Exception {
+        final Class<?> builderClass = clazz.getMethod("builder").getReturnType();
+        assertEquals("Builder", builderClass.getSimpleName(), String.format(
+                "Builder for %s should be named Builder.  Use @Builder(builderClassName = \"Builder\")",
+                clazz.getSimpleName()
+        ));
+        assertEquals(clazz, builderClass.getEnclosingClass(), String.format(
+                "Builder for %s should be a nested class of %s",
+                clazz.getSimpleName(), clazz.getSimpleName()
+        ));
+    }
+
+    /**
+     * All List fields allow @Singular so entries can be added one at a time
+     */
+    @ParameterizedTest(name = "listsUseSingular - {0}")
+    @MethodSource("classes")
+    public void listsUseSingular(final Class<?> clazz) throws Exception {
+        final Class<?> builderClass = clazz.getMethod("builder").getReturnType();
+        final Set<String> builderMethods = Arrays.stream(builderClass.getMethods())
+                .map(Method::getName)
+                .collect(Collectors.toSet());
+
+        for (final Field field : clazz.getDeclaredFields()) {
+            if (!List.class.isAssignableFrom(field.getType())) continue;
+
+            final String name = field.getName();
+            final String clearMethod = "clear" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+
+            assertTrue(builderMethods.contains(clearMethod), String.format(
+                    "List field '%s' in class %s should be annotated @Singular.  Builder is missing %s()",
+                    name, clazz.getName(), clearMethod
+            ));
+        }
     }
 }

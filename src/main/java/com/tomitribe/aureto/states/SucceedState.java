@@ -23,7 +23,7 @@ import lombok.Builder;
  * @param output the state output; a JSON value or a JSONata string, defaults to the state input
  * @see <a href="https://states-language.net/spec.html#succeed-state">Succeed State</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record SucceedState(@JsonbProperty("Comment") String comment,
                            @JsonbProperty("QueryLanguage") String queryLanguage,
                            @JsonbProperty("Output") JsonValue output) implements State {

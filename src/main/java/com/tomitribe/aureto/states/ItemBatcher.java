@@ -24,7 +24,7 @@ import lombok.Builder;
  * @param maxInputBytesPerBatch maximum size in bytes of each sub-array
  * @see <a href="https://states-language.net/spec.html#batching-items">Batching Items</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record ItemBatcher(@JsonbProperty("BatchInput") JsonValue batchInput,
                           @JsonbProperty("MaxItemsPerBatch") Integer maxItemsPerBatch,
                           @JsonbProperty("MaxInputBytesPerBatch") Integer maxInputBytesPerBatch) {

@@ -14,6 +14,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
 import lombok.Builder;
+import lombok.Singular;
 
 import java.util.List;
 
@@ -40,15 +41,15 @@ import java.util.List;
  * @param end true marks this state as terminal
  * @see <a href="https://states-language.net/spec.html#task-state">Task State</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record TaskState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("QueryLanguage") String queryLanguage,
                         @JsonbProperty("Resource") String resource,
                         @JsonbProperty("Arguments") JsonValue arguments,
                         @JsonbProperty("Output") JsonValue output,
                         @JsonbProperty("Assign") JsonObject assign,
-                        @JsonbProperty("Retry") List<Retrier> retry,
-                        @JsonbProperty("Catch") List<Catcher> catchers,
+                        @JsonbProperty("Retry") @Singular("retrier") List<Retrier> retry,
+                        @JsonbProperty("Catch") @Singular("catcher") List<Catcher> catchers,
                         @JsonbProperty("TimeoutSeconds") Integer timeoutSeconds,
                         @JsonbProperty("HeartbeatSeconds") Integer heartbeatSeconds,
                         @JsonbProperty("Credentials") JsonObject credentials,
@@ -56,5 +57,7 @@ public record TaskState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("End") Boolean end) implements State {
     public TaskState {
         ValidCheck.requireNotNull(resource, "resource");
+        retry = retry == null || retry.isEmpty() ? null : List.copyOf(retry);
+        catchers = catchers == null || catchers.isEmpty() ? null : List.copyOf(catchers);
     }
 }

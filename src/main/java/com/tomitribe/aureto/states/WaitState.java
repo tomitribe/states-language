@@ -33,7 +33,7 @@ import lombok.Builder;
  * @param end true marks this state as terminal
  * @see <a href="https://states-language.net/spec.html#wait-state">Wait State</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record WaitState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("QueryLanguage") String queryLanguage,
                         @JsonbProperty("Seconds") Integer seconds,

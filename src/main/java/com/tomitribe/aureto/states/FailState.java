@@ -22,7 +22,7 @@ import lombok.Builder;
  * @param cause human-readable failure message, or a JSONata string evaluating to one
  * @see <a href="https://states-language.net/spec.html#fail-state">Fail State</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record FailState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("QueryLanguage") String queryLanguage,
                         @JsonbProperty("Error") String error,

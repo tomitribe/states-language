@@ -27,7 +27,7 @@ import lombok.Builder;
  * @param end true marks this state as terminal
  * @see <a href="https://states-language.net/spec.html#pass-state">Pass State</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record PassState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("QueryLanguage") String queryLanguage,
                         @JsonbProperty("Output") JsonValue output,

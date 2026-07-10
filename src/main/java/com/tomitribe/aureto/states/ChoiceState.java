@@ -14,6 +14,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
 import lombok.Builder;
+import lombok.Singular;
 
 import java.util.List;
 
@@ -37,14 +38,15 @@ import java.util.List;
  * @param assign variable assignments evaluated when no rule matches
  * @see <a href="https://states-language.net/spec.html#choice-state">Choice State</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record ChoiceState(@JsonbProperty("Comment") String comment,
                           @JsonbProperty("QueryLanguage") String queryLanguage,
-                          @JsonbProperty("Choices") List<ChoiceRule> choices,
+                          @JsonbProperty("Choices") @Singular List<ChoiceRule> choices,
                           @JsonbProperty("Default") String defaultState,
                           @JsonbProperty("Output") JsonValue output,
                           @JsonbProperty("Assign") JsonObject assign) implements State {
     public ChoiceState {
+        choices = choices == null || choices.isEmpty() ? null : List.copyOf(choices);
         ValidCheck.requireNotNull(choices, "choices");
     }
 }

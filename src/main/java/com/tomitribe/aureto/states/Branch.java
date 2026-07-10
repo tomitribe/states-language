@@ -25,7 +25,7 @@ import java.util.Map;
  * @param states the states of the branch, keyed by state name
  * @see <a href="https://states-language.net/spec.html#parallel-state">Parallel State</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record Branch(@JsonbProperty("StartAt") String startAt,
                      @JsonbProperty("States") Map<String, State> states) {
     public Branch {

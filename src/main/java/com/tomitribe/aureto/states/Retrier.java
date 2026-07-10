@@ -12,6 +12,7 @@ package com.tomitribe.aureto.states;
 import io.github.aglibs.validcheck.ValidCheck;
 import jakarta.json.bind.annotation.JsonbProperty;
 import lombok.Builder;
+import lombok.Singular;
 
 import java.util.List;
 
@@ -35,14 +36,15 @@ import java.util.List;
  * @param jitterStrategy interpreter-defined jitter strategy name
  * @see <a href="https://states-language.net/spec.html#retrying-after-error">Retrying after error</a>
  */
-@Builder(toBuilder = true)
-public record Retrier(@JsonbProperty("ErrorEquals") List<String> errorEquals,
+@Builder(toBuilder = true, builderClassName = "Builder")
+public record Retrier(@JsonbProperty("ErrorEquals") @Singular("error") List<String> errorEquals,
                       @JsonbProperty("IntervalSeconds") Integer intervalSeconds,
                       @JsonbProperty("MaxAttempts") Integer maxAttempts,
                       @JsonbProperty("MaxDelaySeconds") Integer maxDelaySeconds,
                       @JsonbProperty("BackoffRate") Double backoffRate,
                       @JsonbProperty("JitterStrategy") String jitterStrategy) {
     public Retrier {
+        errorEquals = errorEquals == null || errorEquals.isEmpty() ? null : List.copyOf(errorEquals);
         ValidCheck.requireNotNull(errorEquals, "errorEquals");
     }
 }

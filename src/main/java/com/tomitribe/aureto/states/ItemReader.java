@@ -25,7 +25,7 @@ import lombok.Builder;
  * @param arguments input to the reader task; a JSON object or a JSONata string evaluating to one
  * @see <a href="https://states-language.net/spec.html#reading-items">Reading Items</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record ItemReader(@JsonbProperty("Resource") String resource,
                          @JsonbProperty("ReaderConfig") JsonObject readerConfig,
                          @JsonbProperty("Arguments") JsonValue arguments) {

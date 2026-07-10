@@ -30,7 +30,7 @@ import lombok.Builder;
  * @param next name of the state to transition to if this rule is chosen; required
  * @see <a href="https://states-language.net/spec.html#jsonata-choice-rules">JSONata Choice Rules</a>
  */
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "Builder")
 public record ChoiceRule(@JsonbProperty("Comment") String comment,
                          @JsonbProperty("Condition") JsonValue condition,
                          @JsonbProperty("Output") JsonValue output,

@@ -1,0 +1,100 @@
+{
+  "Comment": "Exercises Pass, Choice, Wait, Parallel, Succeed and Fail states",
+  "QueryLanguage": "JSONata",
+  "StartAt": "Prepare",
+  "States": {
+    "Prepare": {
+      "Type": "Pass",
+      "Comment": "Seeds variables used by later states",
+      "Assign": {
+        "requested": "{% $states.input.version %}"
+      },
+      "Output": "{% $states.input %}",
+      "Next": "CheckStatus"
+    },
+    "CheckStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Comment": "Release is ready for fan out",
+          "Condition": "{% $states.input.status = 'READY' %}",
+          "Assign": {
+            "range": "ready"
+          },
+          "Next": "FanOut"
+        },
+        {
+          "Condition": "{% $states.input.status = 'PENDING' %}",
+          "Output": {
+            "status": "{% $states.input.status %}",
+            "waited": true
+          },
+          "Next": "CoolDown"
+        }
+      ],
+      "Default": "Reject",
+      "Assign": {
+        "range": "default"
+      },
+      "Output": "{% $states.input %}"
+    },
+    "CoolDown": {
+      "Type": "Wait",
+      "Seconds": 30,
+      "Next": "Deadline"
+    },
+    "Deadline": {
+      "Type": "Wait",
+      "Timestamp": "2026-03-14T01:59:00Z",
+      "Output": "{% $states.input %}",
+      "Next": "CheckStatus"
+    },
+    "FanOut": {
+      "Type": "Parallel",
+      "Arguments": "{% $states.input %}",
+      "Branches": [
+        {
+          "StartAt": "NotifySupport",
+          "States": {
+            "NotifySupport": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-east-1:123456789012:function:NotifySupport",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "UpdateRecords",
+          "States": {
+            "UpdateRecords": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-east-1:123456789012:function:UpdateRecords",
+              "End": true
+            }
+          }
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Assign": {
+            "failed": true
+          },
+          "Next": "Reject"
+        }
+      ],
+      "Output": "{% $states.result %}",
+      "Next": "Done"
+    },
+    "Done": {
+      "Type": "Succeed",
+      "Comment": "All notifications delivered",
+      "Output": "{% $states.input %}"
+    },
+    "Reject": {
+      "Type": "Fail",
+      "Error": "ReleaseNotReady",
+      "Cause": "The release was not in READY status"
+    }
+  }
+}

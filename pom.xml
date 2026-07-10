@@ -1,0 +1,126 @@
+<!--
+  Tomitribe Confidential
+
+  Copyright Tomitribe Corporation. 2026
+
+  The source code for this program is not published or otherwise divested
+  of its trade secrets, irrespective of what has been deposited with the
+  U.S. Copyright Office.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.tomitribe</groupId>
+    <artifactId>tomitribe-parent</artifactId>
+    <version>19</version>
+  </parent>
+
+  <groupId>com.tomitribe.aureto</groupId>
+  <artifactId>aureto-states</artifactId>
+  <version>0.3-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>Aureto :: States</name>
+  <url>http://www.tomitribe.com</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <dependency.version.junit>5.9.3</dependency.version.junit>
+    <dependency.version.johnzon>2.1.0</dependency.version.johnzon>
+    <dependency.version.lombok>1.18.38</dependency.version.lombok>
+    <dependency.version.validcheck>0.9.8</dependency.version.validcheck>
+    <dependency.version.reflections>0.9.12</dependency.version.reflections>
+
+    <dependency.jakarta.jsonp-api.version>2.1.3</dependency.jakarta.jsonp-api.version>
+    <dependency.jakarta.jsonb-api.version>3.0.1</dependency.jakarta.jsonb-api.version>
+
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+  </properties>
+
+  <!-- Keep the deps as minimal as possible -->
+  <dependencies>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${dependency.version.lombok}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.json</groupId>
+      <artifactId>jakarta.json-api</artifactId>
+      <version>${dependency.jakarta.jsonp-api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.json.bind</groupId>
+      <artifactId>jakarta.json.bind-api</artifactId>
+      <version>${dependency.jakarta.jsonb-api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.ag-libs.validcheck</groupId>
+      <artifactId>validcheck</artifactId>
+      <version>${dependency.version.validcheck}</version>
+    </dependency>
+
+    <!-- TESTS -->
+    <dependency>
+      <groupId>org.apache.johnzon</groupId>
+      <artifactId>johnzon-jsonb</artifactId>
+      <version>${dependency.version.johnzon}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${dependency.version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${dependency.version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>${dependency.version.reflections}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <defaultGoal>install</defaultGoal>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <release>17</release>
+          <argLine>-Duser.language=en -Duser.region=US</argLine>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <argLine>-Duser.language=en -Duser.region=US</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>tomitribe-all</id>
+      <name>Tomitribe Repository</name>
+      <url>https://repository.tomitribe.com/content/groups/tomitribe/</url>
+    </repository>
+  </repositories>
+
+</project>

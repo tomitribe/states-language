@@ -1,0 +1,80 @@
+{
+  "Comment": "Distribute a release to all customers and email a summary",
+  "QueryLanguage": "JSONata",
+  "StartAt": "ExpandCustomers",
+  "States": {
+    "ExpandCustomers": {
+      "Type": "Task",
+      "Comment": "Produces one item of work per customer entitled to this release",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ExpandCustomers",
+      "Arguments": "{% $merge([$states.input, {'step': $states.context.State.Name}]) %}",
+      "Assign": {
+        "product": "{% $states.input.product %}",
+        "version": "{% $states.input.version %}"
+      },
+      "TimeoutSeconds": 300,
+      "Next": "DistributeToCustomers"
+    },
+    "DistributeToCustomers": {
+      "Type": "Map",
+      "Items": "{% $states.input %}",
+      "MaxConcurrency": 40,
+      "ItemProcessor": {
+        "StartAt": "WeaveRelease",
+        "States": {
+          "WeaveRelease": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:us-east-1:123456789012:function:WeaveRelease",
+            "Arguments": "{% $merge([$states.input, {'step': $states.context.State.Name}]) %}",
+            "Retry": [
+              {
+                "ErrorEquals": ["States.Timeout"],
+                "IntervalSeconds": 3,
+                "MaxAttempts": 2,
+                "BackoffRate": 2.0
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "Output": "{% $merge([$states.input, {'error': $states.errorOutput}]) %}",
+                "Next": "MarkFailed"
+              }
+            ],
+            "Next": "PublishRelease"
+          },
+          "PublishRelease": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:us-east-1:123456789012:function:PublishRelease",
+            "Arguments": "{% $merge([$states.input, {'step': $states.context.State.Name}]) %}",
+            "Catch": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "Output": "{% $merge([$states.input, {'error': $states.errorOutput}]) %}",
+                "Next": "MarkFailed"
+              }
+            ],
+            "End": true
+          },
+          "MarkFailed": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:us-east-1:123456789012:function:MarkFailed",
+            "Arguments": "{% $merge([$states.input, {'step': $states.context.State.Name}]) %}",
+            "End": true
+          }
+        }
+      },
+      "Next": "SendSummary"
+    },
+    "SendSummary": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:SendSummary",
+      "Arguments": {
+        "step": "{% $states.context.State.Name %}",
+        "total": "{% $count($states.input) %}",
+        "results": "{% $states.input %}"
+      },
+      "End": true
+    }
+  }
+}

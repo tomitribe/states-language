@@ -26,6 +26,7 @@ import java.util.List;
  * terminated.  A Succeed State inside a branch merely ends its own branch.
  *
  * @param comment human-readable description of the state
+ * @param queryLanguage overrides the state machine's query language; this model targets JSONata
  * @param branches the branches to execute concurrently; required, non-empty
  * @param arguments input to each branch's StartAt state; a JSON value or a JSONata string
  * @param output the state output; a JSON value or a JSONata string, may reference $states.result
@@ -38,6 +39,7 @@ import java.util.List;
  */
 @Builder(toBuilder = true)
 public record ParallelState(@JsonbProperty("Comment") String comment,
+                            @JsonbProperty("QueryLanguage") String queryLanguage,
                             @JsonbProperty("Branches") List<Branch> branches,
                             @JsonbProperty("Arguments") JsonValue arguments,
                             @JsonbProperty("Output") JsonValue output,

@@ -20,6 +20,7 @@ import lombok.Builder;
  * variables with {@code assign}.
  *
  * @param comment human-readable description of the state
+ * @param queryLanguage overrides the state machine's query language; this model targets JSONata
  * @param output the state output; a JSON value or a JSONata string, defaults to the state input
  * @param assign variable assignments; values may be JSONata strings, effective in the next state
  * @param next name of the state to transition to; exactly one of next or end is required
@@ -28,6 +29,7 @@ import lombok.Builder;
  */
 @Builder(toBuilder = true)
 public record PassState(@JsonbProperty("Comment") String comment,
+                        @JsonbProperty("QueryLanguage") String queryLanguage,
                         @JsonbProperty("Output") JsonValue output,
                         @JsonbProperty("Assign") JsonObject assign,
                         @JsonbProperty("Next") String next,

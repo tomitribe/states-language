@@ -30,6 +30,7 @@ import java.util.List;
  * Choice Rule matches and the default transition is taken.
  *
  * @param comment human-readable description of the state
+ * @param queryLanguage overrides the state machine's query language; this model targets JSONata
  * @param choices the Choice Rules, scanned in order; required, non-empty
  * @param defaultState name of the state to execute if no rule matches
  * @param output the state output when no rule matches; a JSON value or a JSONata string
@@ -38,6 +39,7 @@ import java.util.List;
  */
 @Builder(toBuilder = true)
 public record ChoiceState(@JsonbProperty("Comment") String comment,
+                          @JsonbProperty("QueryLanguage") String queryLanguage,
                           @JsonbProperty("Choices") List<ChoiceRule> choices,
                           @JsonbProperty("Default") String defaultState,
                           @JsonbProperty("Output") JsonValue output,

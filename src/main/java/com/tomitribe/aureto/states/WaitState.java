@@ -24,6 +24,7 @@ import lombok.Builder;
  * of a numeric offset, for example "2016-03-14T01:59:00Z".
  *
  * @param comment human-readable description of the state
+ * @param queryLanguage overrides the state machine's query language; this model targets JSONata
  * @param seconds non-negative integer wait duration
  * @param timestamp absolute expiry time, or a JSONata string evaluating to one
  * @param output the state output; a JSON value or a JSONata string, defaults to the state input
@@ -34,6 +35,7 @@ import lombok.Builder;
  */
 @Builder(toBuilder = true)
 public record WaitState(@JsonbProperty("Comment") String comment,
+                        @JsonbProperty("QueryLanguage") String queryLanguage,
                         @JsonbProperty("Seconds") Integer seconds,
                         @JsonbProperty("Timestamp") String timestamp,
                         @JsonbProperty("Output") JsonValue output,

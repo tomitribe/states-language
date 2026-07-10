@@ -19,10 +19,12 @@ import lombok.Builder;
  * and may not assign variables.
  *
  * @param comment human-readable description of the state
+ * @param queryLanguage overrides the state machine's query language; this model targets JSONata
  * @param output the state output; a JSON value or a JSONata string, defaults to the state input
  * @see <a href="https://states-language.net/spec.html#succeed-state">Succeed State</a>
  */
 @Builder(toBuilder = true)
 public record SucceedState(@JsonbProperty("Comment") String comment,
+                           @JsonbProperty("QueryLanguage") String queryLanguage,
                            @JsonbProperty("Output") JsonValue output) implements State {
 }

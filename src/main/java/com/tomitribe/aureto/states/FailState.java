@@ -17,12 +17,14 @@ import lombok.Builder;
  * terminal and may not assign variables or reshape output.
  *
  * @param comment human-readable description of the state
+ * @param queryLanguage overrides the state machine's query language; this model targets JSONata
  * @param error error name for Retry/Catch or diagnostic purposes, or a JSONata string evaluating to one
  * @param cause human-readable failure message, or a JSONata string evaluating to one
  * @see <a href="https://states-language.net/spec.html#fail-state">Fail State</a>
  */
 @Builder(toBuilder = true)
 public record FailState(@JsonbProperty("Comment") String comment,
+                        @JsonbProperty("QueryLanguage") String queryLanguage,
                         @JsonbProperty("Error") String error,
                         @JsonbProperty("Cause") String cause) implements State {
 }

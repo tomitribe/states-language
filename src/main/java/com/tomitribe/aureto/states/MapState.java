@@ -29,6 +29,7 @@ import java.util.List;
  * same order as the items array regardless of completion order.
  *
  * @param comment human-readable description of the state
+ * @param queryLanguage overrides the state machine's query language; this model targets JSONata
  * @param items the items array; a JSON array or a JSONata string producing one
  * @param itemReader reads items from an external resource instead of the state input
  * @param itemSelector overrides each single element of the items array; a JSON value or a JSONata string
@@ -48,6 +49,7 @@ import java.util.List;
  */
 @Builder(toBuilder = true)
 public record MapState(@JsonbProperty("Comment") String comment,
+                       @JsonbProperty("QueryLanguage") String queryLanguage,
                        @JsonbProperty("Items") JsonValue items,
                        @JsonbProperty("ItemReader") ItemReader itemReader,
                        @JsonbProperty("ItemSelector") JsonValue itemSelector,

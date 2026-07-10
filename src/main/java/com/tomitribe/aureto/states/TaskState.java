@@ -26,6 +26,7 @@ import java.util.List;
  * {@code output} is absent the state output is the task's result.
  *
  * @param comment human-readable description of the state
+ * @param queryLanguage overrides the state machine's query language; this model targets JSONata
  * @param resource URI uniquely identifying the task to execute; required
  * @param arguments input to the task; a JSON value or a JSONata string, defaults to the state input
  * @param output the state output; a JSON value or a JSONata string, may reference $states.result
@@ -41,6 +42,7 @@ import java.util.List;
  */
 @Builder(toBuilder = true)
 public record TaskState(@JsonbProperty("Comment") String comment,
+                        @JsonbProperty("QueryLanguage") String queryLanguage,
                         @JsonbProperty("Resource") String resource,
                         @JsonbProperty("Arguments") JsonValue arguments,
                         @JsonbProperty("Output") JsonValue output,

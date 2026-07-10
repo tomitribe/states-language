@@ -48,5 +48,6 @@ public record Catcher(@JsonbProperty("ErrorEquals") @Singular("error") List<Stri
         errorEquals = errorEquals == null || errorEquals.isEmpty() ? null : List.copyOf(errorEquals);
         ValidCheck.requireNotNull(errorEquals, "errorEquals");
         ValidCheck.requireNotNull(next, "next");
+        Names.requireValidAssign(assign);
     }
 }

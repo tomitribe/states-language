@@ -39,5 +39,6 @@ public record StateMachine(@JsonbProperty("Comment") String comment,
     public StateMachine {
         ValidCheck.requireNotNull(startAt, "startAt");
         ValidCheck.requireNotNull(states, "states");
+        states.keySet().forEach(Names::requireValidStateName);
     }
 }

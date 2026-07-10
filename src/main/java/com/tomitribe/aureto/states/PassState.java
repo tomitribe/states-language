@@ -34,4 +34,7 @@ public record PassState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("Assign") JsonObject assign,
                         @JsonbProperty("Next") String next,
                         @JsonbProperty("End") Boolean end) implements State {
+    public PassState {
+        Names.requireValidAssign(assign);
+    }
 }

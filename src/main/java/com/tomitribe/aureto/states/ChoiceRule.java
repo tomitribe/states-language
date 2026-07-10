@@ -39,5 +39,6 @@ public record ChoiceRule(@JsonbProperty("Comment") String comment,
     public ChoiceRule {
         ValidCheck.requireNotNull(condition, "condition");
         ValidCheck.requireNotNull(next, "next");
+        Names.requireValidAssign(assign);
     }
 }

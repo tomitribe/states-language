@@ -42,4 +42,7 @@ public record WaitState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("Assign") JsonObject assign,
                         @JsonbProperty("Next") String next,
                         @JsonbProperty("End") Boolean end) implements State {
+    public WaitState {
+        Names.requireValidAssign(assign);
+    }
 }

@@ -31,5 +31,6 @@ public record Branch(@JsonbProperty("StartAt") String startAt,
     public Branch {
         ValidCheck.requireNotNull(startAt, "startAt");
         ValidCheck.requireNotNull(states, "states");
+        states.keySet().forEach(Names::requireValidStateName);
     }
 }

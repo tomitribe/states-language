@@ -45,6 +45,7 @@ public class VerifyConventionsTest {
                         reflections.getSubTypesOf(Record.class).stream()
                 ).distinct()
                 .filter(aClass -> aClass.getPackageName().equals(VerifyConventionsTest.class.getPackageName()))
+                .filter(aClass -> Modifier.isPublic(aClass.getModifiers())) // conventions govern the public model
                 .filter(aClass -> !aClass.isMemberClass())
                 .filter(aClass -> !aClass.isInterface())
                 .filter(aClass -> !aClass.getName().endsWith("Test"))

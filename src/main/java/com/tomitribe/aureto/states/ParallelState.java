@@ -52,6 +52,7 @@ public record ParallelState(@JsonbProperty("Comment") String comment,
     public ParallelState {
         branches = branches == null || branches.isEmpty() ? null : List.copyOf(branches);
         ValidCheck.requireNotNull(branches, "branches");
+        Names.requireValidAssign(assign);
         retry = retry == null || retry.isEmpty() ? null : List.copyOf(retry);
         catchers = catchers == null || catchers.isEmpty() ? null : List.copyOf(catchers);
     }

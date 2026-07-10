@@ -48,5 +48,6 @@ public record ChoiceState(@JsonbProperty("Comment") String comment,
     public ChoiceState {
         choices = choices == null || choices.isEmpty() ? null : List.copyOf(choices);
         ValidCheck.requireNotNull(choices, "choices");
+        Names.requireValidAssign(assign);
     }
 }

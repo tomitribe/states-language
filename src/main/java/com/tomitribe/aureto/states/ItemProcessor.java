@@ -35,5 +35,6 @@ public record ItemProcessor(@JsonbProperty("ProcessorConfig") JsonObject process
     public ItemProcessor {
         ValidCheck.requireNotNull(startAt, "startAt");
         ValidCheck.requireNotNull(states, "states");
+        states.keySet().forEach(Names::requireValidStateName);
     }
 }

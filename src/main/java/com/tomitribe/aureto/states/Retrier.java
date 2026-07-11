@@ -30,10 +30,12 @@ import java.util.List;
  *
  * @param errorEquals error names this Retrier matches; required, non-empty
  * @param intervalSeconds seconds before the first retry, default 1
- * @param maxAttempts maximum retries, default 3; zero is legal and means never retry
+ * @param maxAttempts maximum retries, default 3; zero — readable as
+ *                    {@link MaxAttempts#NEVER} — is legal and means never retry
  * @param maxDelaySeconds upper bound in seconds on the computed retry interval
  * @param backoffRate multiplier applied to the interval on each attempt, default 2.0
- * @param jitterStrategy interpreter-defined jitter strategy name
+ * @param jitterStrategy interpreter-defined jitter strategy name; AWS defines
+ *                       {@link JitterStrategy#NONE} and {@link JitterStrategy#FULL}
  * @see <a href="https://states-language.net/spec.html#retrying-after-error">Retrying after error</a>
  */
 @Builder(toBuilder = true, builderClassName = "Builder")
@@ -46,5 +48,35 @@ public record Retrier(@JsonbProperty("ErrorEquals") @Singular("error") List<Stri
     public Retrier {
         errorEquals = errorEquals == null || errorEquals.isEmpty() ? null : List.copyOf(errorEquals);
         ValidCheck.requireNotNull(errorEquals, "errorEquals");
+    }
+
+    /**
+     * Named values for the "MaxAttempts" field.  The spec notes a value of
+     * zero is legal, specifying that some error or errors should never be
+     * retried — {@code maxAttempts(MaxAttempts.NEVER)} says so in code.
+     */
+    public interface MaxAttempts {
+
+        int NEVER = 0;
+    }
+
+    /**
+     * Named values for the "JitterStrategy" field.  The States Language
+     * does not constrain the value — it is an interpreter-defined string —
+     * but AWS Step Functions defines exactly these two.
+     */
+    public interface JitterStrategy {
+
+        /**
+         * The computed retry interval is used as is
+         */
+        String NONE = "NONE";
+
+        /**
+         * AWS replaces the computed retry interval with a random delay
+         * between zero and that interval, spreading out retries from
+         * simultaneous failures
+         */
+        String FULL = "FULL";
     }
 }

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Output shares its mechanics with Arguments through the same hidden
@@ -51,6 +52,10 @@ class OutputTest {
                   "resultStatus": "{% $states.result.status %}",
                   "processed": true
                 }""", object.toJsonValue().toString());
+
+        assertTrue(object.isExpression("customer"));
+        assertEquals("$states.result.status", object.getExpression("resultStatus"));
+        assertTrue(object.getBoolean("processed"));
     }
 
     @Test

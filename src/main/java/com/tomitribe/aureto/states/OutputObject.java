@@ -22,7 +22,7 @@ import jakarta.json.JsonValue;
  *               their delimited string form
  * @see <a href="https://states-language.net/spec.html#arguments-and-output">Using Arguments and Output</a>
  */
-public record OutputObject(JsonObject values) implements Output {
+public record OutputObject(JsonObject values) implements Output, Values {
 
     public OutputObject {
         ValidCheck.requireNotNull(values, "values");
@@ -30,6 +30,11 @@ public record OutputObject(JsonObject values) implements Output {
 
     @Override
     public JsonValue toJsonValue() {
+        return values;
+    }
+
+    @Override
+    public JsonObject toJsonObject() {
         return values;
     }
 

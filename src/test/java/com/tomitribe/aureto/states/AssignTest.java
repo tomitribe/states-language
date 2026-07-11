@@ -78,7 +78,7 @@ class AssignTest {
 
         final IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
                 () -> assign.getExpression("courier"));
-        assertEquals("Variable \"courier\" is not a JSONata expression: \"UQS\"", failure.getMessage());
+        assertEquals("Assign member \"courier\" is not a JSONata expression: \"UQS\"", failure.getMessage());
     }
 
     @Test
@@ -91,8 +91,8 @@ class AssignTest {
         final IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
                 () -> assign.getString("produtc"));
 
-        assertEquals("No variable named \"produtc\" is assigned.  "
-                + "Assigned variables are: product, version", failure.getMessage());
+        assertEquals("Assign has no member named \"produtc\".  "
+                + "Members present: product, version", failure.getMessage());
     }
 
     @Test
@@ -104,7 +104,7 @@ class AssignTest {
         final IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
                 () -> assign.getString("attempts"));
 
-        assertEquals("Variable \"attempts\" is not a string.  It is a NUMBER: 3", failure.getMessage());
+        assertEquals("Assign member \"attempts\" is not a string.  It is a NUMBER: 3", failure.getMessage());
     }
 
     /**

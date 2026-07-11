@@ -108,8 +108,8 @@ class ArgumentsTest {
                 .value("attempts", 1)
                 .build();
 
-        assertEquals("UQS", copy.values().getString("courier"));
-        assertEquals(1, copy.values().getInt("attempts"));
+        assertEquals("UQS", copy.getString("courier"));
+        assertEquals(1, copy.getInt("attempts"));
         assertEquals(1, original.values().size());
     }
 

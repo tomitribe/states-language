@@ -9,7 +9,6 @@
  */
 package com.tomitribe.aureto.states;
 
-import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.adapter.JsonbAdapter;
@@ -17,28 +16,37 @@ import jakarta.json.bind.adapter.JsonbAdapter;
 import java.util.function.Function;
 
 /**
- * Serializes the model's object-or-expression unions — Arguments, Output —
- * and restores the correct form on deserialization: a JSON object becomes
- * the object form, a "{%"-delimited string becomes the expression form with
- * the delimiters stripped.  Any other JSON value fails with a message
- * naming the field; a bare string in particular is almost certainly an
- * expression missing its delimiters.
+ * Serializes the model's structure-or-expression unions — Arguments and
+ * Output, whose structural form is a JSON object, and Items, whose
+ * structural form is a JSON array — and restores the correct form on
+ * deserialization: the structural type becomes the structural form, a
+ * "{%"-delimited string becomes the expression form with the delimiters
+ * stripped.  Any other JSON value fails with a message naming the field; a
+ * bare string in particular is almost certainly an expression missing its
+ * delimiters.
  *
  * @param <A> the union interface the adapter serves
+ * @param <J> the JSON type of the union's structural form
  */
-class UnionAdapter<A> implements JsonbAdapter<A, JsonValue> {
+class UnionAdapter<A, J extends JsonValue> implements JsonbAdapter<A, JsonValue> {
 
     private final String field;
-    private final Function<JsonObject, A> objects;
+    private final String structureNoun;
+    private final Class<J> structure;
+    private final Function<J, A> structures;
     private final Function<String, A> expressions;
     private final Function<A, JsonValue> json;
 
     UnionAdapter(final String field,
-                 final Function<JsonObject, A> objects,
+                 final String structureNoun,
+                 final Class<J> structure,
+                 final Function<J, A> structures,
                  final Function<String, A> expressions,
                  final Function<A, JsonValue> json) {
         this.field = field;
-        this.objects = objects;
+        this.structureNoun = structureNoun;
+        this.structure = structure;
+        this.structures = structures;
         this.expressions = expressions;
         this.json = json;
     }
@@ -50,13 +58,13 @@ class UnionAdapter<A> implements JsonbAdapter<A, JsonValue> {
 
     @Override
     public A adaptFromJson(final JsonValue value) {
-        if (value instanceof JsonObject object) return objects.apply(object);
+        if (structure.isInstance(value)) return structures.apply(structure.cast(value));
         if (value instanceof JsonString string && Expressions.isDelimited(string.getString())) {
             return expressions.apply(Expressions.strip(string.getString()));
         }
         throw new IllegalArgumentException(String.format(
-                "%s must be a JSON object or a JSONata expression string"
+                "%s must be a JSON %s or a JSONata expression string"
                         + " delimited by {%% %%}.  Found %s: %s",
-                field, value.getValueType(), value));
+                field, structureNoun, value.getValueType(), value));
     }
 }

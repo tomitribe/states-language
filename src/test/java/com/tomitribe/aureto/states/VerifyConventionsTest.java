@@ -132,7 +132,8 @@ public class VerifyConventionsTest {
         final Map<Class<?>, Class<?>> adapters = Map.of(
                 Assign.class, Assign.Adapter.class,
                 Arguments.class, Arguments.Adapter.class,
-                Output.class, Output.Adapter.class
+                Output.class, Output.Adapter.class,
+                Items.class, Items.Adapter.class
         );
 
         for (final Field field : clazz.getDeclaredFields()) {
@@ -164,7 +165,8 @@ public class VerifyConventionsTest {
                 .collect(Collectors.toSet());
 
         for (final Field field : clazz.getDeclaredFields()) {
-            if (!List.class.isAssignableFrom(field.getType())) continue;
+            // declared as List exactly; JsonArray fields are adapted types, not @Singular candidates
+            if (!List.class.equals(field.getType())) continue;
 
             final String name = field.getName();
             final String clearMethod = "clear" + Character.toUpperCase(name.charAt(0)) + name.substring(1);

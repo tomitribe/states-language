@@ -9,6 +9,7 @@
  */
 package com.tomitribe.aureto.states;
 
+import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
 /**
@@ -40,10 +41,11 @@ public sealed interface Arguments permits ArgumentsObject, ArgumentsExpression {
      * plain JSON object it represents, restoring the correct form on
      * deserialization
      */
-    class Adapter extends UnionAdapter<Arguments> {
+    class Adapter extends UnionAdapter<Arguments, JsonObject> {
 
         public Adapter() {
-            super("Arguments", ArgumentsObject::new, ArgumentsExpression::new, Arguments::toJsonValue);
+            super("Arguments", "object", JsonObject.class,
+                    ArgumentsObject::new, ArgumentsExpression::new, Arguments::toJsonValue);
         }
     }
 }

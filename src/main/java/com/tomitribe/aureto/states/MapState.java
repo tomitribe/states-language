@@ -51,7 +51,7 @@ import java.util.List;
 @Builder(toBuilder = true, builderClassName = "Builder")
 public record MapState(@JsonbProperty("Comment") String comment,
                        @JsonbProperty("QueryLanguage") String queryLanguage,
-                       @JsonbProperty("Items") JsonValue items,
+                       @JsonbProperty("Items") @JsonbTypeAdapter(Items.Adapter.class) Items items,
                        @JsonbProperty("ItemReader") ItemReader itemReader,
                        @JsonbProperty("ItemSelector") JsonValue itemSelector,
                        @JsonbProperty("ItemBatcher") ItemBatcher itemBatcher,

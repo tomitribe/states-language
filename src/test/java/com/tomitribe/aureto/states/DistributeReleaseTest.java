@@ -10,7 +10,6 @@
 package com.tomitribe.aureto.states;
 
 import com.tomitribe.aureto.states.test.JsonAsserts;
-import jakarta.json.Json;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -73,7 +72,7 @@ class DistributeReleaseTest {
                 .build();
 
         final MapState distributeToCustomers = MapState.builder()
-                .items(Json.createValue("{% $states.input %}"))
+                .items(Items.expression("$states.input"))
                 .maxConcurrency(40)
                 .itemProcessor(ItemProcessor.builder()
                         .startAt("WeaveRelease")

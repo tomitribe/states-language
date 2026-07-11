@@ -10,7 +10,6 @@
 package com.tomitribe.aureto.states;
 
 import io.github.aglibs.validcheck.ValidCheck;
-import jakarta.json.Json;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -18,8 +17,6 @@ import jakarta.json.JsonValue;
 import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -102,7 +99,7 @@ public record Assign(JsonObject variables) {
      * delimited by "{%" and "%}"
      */
     public boolean isExpression(final String name) {
-        return get(name) instanceof JsonString string && isDelimited(string.getString());
+        return get(name) instanceof JsonString string && Expressions.isDelimited(string.getString());
     }
 
     /**
@@ -111,12 +108,11 @@ public record Assign(JsonObject variables) {
      */
     public String getExpression(final String name) {
         final JsonValue value = get(name);
-        if (!(value instanceof JsonString string) || !isDelimited(string.getString())) {
+        if (!(value instanceof JsonString string) || !Expressions.isDelimited(string.getString())) {
             throw new IllegalArgumentException(String.format(
                     "Variable \"%s\" is not a JSONata expression: %s", name, value));
         }
-        final String expression = string.getString();
-        return expression.substring(2, expression.length() - 2).trim();
+        return Expressions.strip(string.getString());
     }
 
     public static Builder builder() {
@@ -124,13 +120,7 @@ public record Assign(JsonObject variables) {
     }
 
     public Builder toBuilder() {
-        final Builder builder = new Builder();
-        builder.variables.putAll(variables);
-        return builder;
-    }
-
-    private static boolean isDelimited(final String value) {
-        return value.startsWith("{%") && value.endsWith("%}");
+        return new Builder().putAll(variables);
     }
 
     private IllegalArgumentException mismatch(final String name, final JsonValue value, final String expected) {
@@ -139,59 +129,25 @@ public record Assign(JsonObject variables) {
                 name, expected, value.getValueType(), value));
     }
 
-    public static class Builder {
+    public static class Builder extends ObjectBuilder<Builder, Assign> {
 
-        private final Map<String, JsonValue> variables = new LinkedHashMap<>();
-
-        public Builder value(final String name, final String value) {
-            ValidCheck.requireNotNull(value, "value");
-            if (isDelimited(value)) {
-                throw new IllegalArgumentException(String.format(
-                        "Value for variable \"%s\" looks like a JSONata expression: \"%s\"."
-                                + "  Use expression(\"%s\", \"%s\") instead",
-                        name, value, name, value.substring(2, value.length() - 2).trim()));
-            }
-            return value(name, Json.createValue(value));
+        Builder() {
+            super("variable");
         }
 
-        public Builder value(final String name, final int value) {
-            return value(name, Json.createValue(value));
-        }
-
-        public Builder value(final String name, final double value) {
-            return value(name, Json.createValue(value));
-        }
-
-        public Builder value(final String name, final boolean value) {
-            return value(name, value ? JsonValue.TRUE : JsonValue.FALSE);
-        }
-
-        public Builder value(final String name, final JsonValue value) {
-            ValidCheck.requireNotNull(value, "value");
-            variables.put(Names.requireValidVariableName(name), value);
-            return this;
-        }
-
-        /**
-         * Assigns a JSONata expression to the named variable, wrapping it
-         * in the "{%" and "%}" delimiters.  Pass the bare expression, for
-         * example {@code expression("product", "$states.input.product")}
-         */
-        public Builder expression(final String name, final String expression) {
-            ValidCheck.requireNotNull(expression, "expression");
-            if (isDelimited(expression)) {
-                throw new IllegalArgumentException(String.format(
-                        "Expression for variable \"%s\" is already delimited: \"%s\"."
-                                + "  Pass the expression without the {%% %%} delimiters",
-                        name, expression));
-            }
-            return value(name, Json.createValue("{% " + expression + " %}"));
-        }
-
+        @Override
         public Assign build() {
-            final var json = Json.createObjectBuilder();
-            variables.forEach(json::add);
-            return new Assign(json.build());
+            return new Assign(toJsonObject());
+        }
+
+        @Override
+        protected String checkName(final String name) {
+            return Names.requireValidVariableName(name);
+        }
+
+        @Override
+        protected Builder self() {
+            return this;
         }
     }
 

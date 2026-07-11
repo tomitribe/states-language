@@ -16,6 +16,7 @@ import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
 import lombok.Singular;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ import java.util.List;
 @Builder(toBuilder = true, builderClassName = "Builder")
 public record TaskState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("QueryLanguage") String queryLanguage,
-                        @JsonbProperty("Resource") String resource,
+                        @JsonbProperty("Resource") URI resource,
                         @JsonbProperty("Arguments") @JsonbTypeAdapter(Arguments.Adapter.class) Arguments arguments,
                         @JsonbProperty("Output") @JsonbTypeAdapter(Output.Adapter.class) Output output,
                         @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
@@ -59,5 +60,25 @@ public record TaskState(@JsonbProperty("Comment") String comment,
         ValidCheck.requireNotNull(resource, "resource");
         retry = retry == null || retry.isEmpty() ? null : List.copyOf(retry);
         catchers = catchers == null || catchers.isEmpty() ? null : List.copyOf(catchers);
+    }
+
+    public static class Builder {
+
+        // Lombok skips generating any setter whose name is hand-written,
+        // signatures notwithstanding, so declaring the String convenience
+        // requires declaring the URI form as well
+        public Builder resource(final URI resource) {
+            this.resource = resource;
+            return this;
+        }
+
+        /**
+         * Convenience for the common case of a resource URI in hand as a
+         * string, for example an ARN.  Fails immediately if the value is
+         * not a syntactically valid URI.
+         */
+        public Builder resource(final String resource) {
+            return resource(URI.create(resource));
+        }
     }
 }

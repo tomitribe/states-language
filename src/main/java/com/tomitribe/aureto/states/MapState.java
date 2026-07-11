@@ -10,7 +10,6 @@
 package com.tomitribe.aureto.states;
 
 import io.github.aglibs.validcheck.ValidCheck;
-import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
@@ -53,7 +52,7 @@ public record MapState(@JsonbProperty("Comment") String comment,
                        @JsonbProperty("QueryLanguage") String queryLanguage,
                        @JsonbProperty("Items") @JsonbTypeAdapter(Items.Adapter.class) Items items,
                        @JsonbProperty("ItemReader") ItemReader itemReader,
-                       @JsonbProperty("ItemSelector") JsonValue itemSelector,
+                       @JsonbProperty("ItemSelector") @JsonbTypeAdapter(ItemSelector.Adapter.class) ItemSelector itemSelector,
                        @JsonbProperty("ItemBatcher") ItemBatcher itemBatcher,
                        @JsonbProperty("ResultWriter") ResultWriter resultWriter,
                        @JsonbProperty("ItemProcessor") ItemProcessor itemProcessor,

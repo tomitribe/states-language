@@ -9,7 +9,6 @@
  */
 package com.tomitribe.aureto.states;
 
-import jakarta.json.JsonValue;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.annotation.JsonbSubtype;
@@ -63,7 +62,7 @@ class StateTypeTest {
                 PassState.builder().build(),
                 WaitState.builder().seconds(1).build(),
                 ChoiceState.builder().choice(ChoiceRule.builder()
-                        .condition(JsonValue.TRUE)
+                        .condition(Condition.of(true))
                         .next("A")
                         .build()).build(),
                 SucceedState.builder().build(),

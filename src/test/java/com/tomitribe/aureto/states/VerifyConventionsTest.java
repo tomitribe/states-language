@@ -133,7 +133,10 @@ public class VerifyConventionsTest {
                 Assign.class, Assign.Adapter.class,
                 Arguments.class, Arguments.Adapter.class,
                 Output.class, Output.Adapter.class,
-                Items.class, Items.Adapter.class
+                Items.class, Items.Adapter.class,
+                ItemSelector.class, ItemSelector.Adapter.class,
+                BatchInput.class, BatchInput.Adapter.class,
+                Condition.class, Condition.Adapter.class
         );
 
         for (final Field field : clazz.getDeclaredFields()) {

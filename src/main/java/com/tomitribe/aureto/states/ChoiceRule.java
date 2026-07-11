@@ -10,7 +10,6 @@
 package com.tomitribe.aureto.states;
 
 import io.github.aglibs.validcheck.ValidCheck;
-import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
@@ -32,7 +31,7 @@ import lombok.Builder;
  */
 @Builder(toBuilder = true, builderClassName = "Builder")
 public record ChoiceRule(@JsonbProperty("Comment") String comment,
-                         @JsonbProperty("Condition") JsonValue condition,
+                         @JsonbProperty("Condition") @JsonbTypeAdapter(Condition.Adapter.class) Condition condition,
                          @JsonbProperty("Output") @JsonbTypeAdapter(Output.Adapter.class) Output output,
                          @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                          @JsonbProperty("Next") String next) {

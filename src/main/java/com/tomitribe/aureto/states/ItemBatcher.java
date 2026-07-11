@@ -9,8 +9,8 @@
  */
 package com.tomitribe.aureto.states;
 
-import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
 
 /**
@@ -25,7 +25,7 @@ import lombok.Builder;
  * @see <a href="https://states-language.net/spec.html#batching-items">Batching Items</a>
  */
 @Builder(toBuilder = true, builderClassName = "Builder")
-public record ItemBatcher(@JsonbProperty("BatchInput") JsonValue batchInput,
+public record ItemBatcher(@JsonbProperty("BatchInput") @JsonbTypeAdapter(BatchInput.Adapter.class) BatchInput batchInput,
                           @JsonbProperty("MaxItemsPerBatch") Integer maxItemsPerBatch,
                           @JsonbProperty("MaxInputBytesPerBatch") Integer maxInputBytesPerBatch) {
 }

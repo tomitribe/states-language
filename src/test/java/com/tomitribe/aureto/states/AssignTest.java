@@ -12,6 +12,10 @@ package com.tomitribe.aureto.states;
 import com.tomitribe.aureto.states.test.JsonAsserts;
 import jakarta.json.Json;
 import jakarta.json.JsonValue;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -128,16 +132,6 @@ class AssignTest {
     }
 
     @Test
-    public void variableNamesAreValidated() {
-        assertThrows(IllegalArgumentException.class,
-                () -> Assign.builder().value("states", "reserved"));
-        assertThrows(IllegalArgumentException.class,
-                () -> Assign.builder().value("9lives", "starts with a digit"));
-        assertThrows(IllegalArgumentException.class,
-                () -> Assign.builder().value("x".repeat(81), "too long"));
-    }
-
-    @Test
     public void toBuilderRoundTrips() {
         final Assign original = Assign.builder()
                 .value("courier", "UQS")
@@ -152,6 +146,70 @@ class AssignTest {
         assertEquals("$states.input.product", copy.getExpression("product"));
         assertEquals(1, copy.getInt("attempts"));
         assertEquals(Set.of("courier", "product"), original.names());
+    }
+
+    /**
+     * The behavior the states will rely on, verified through an owning
+     * object.  Johnzon 2.1.0 honors the class-level @JsonbTypeAdapter on
+     * Assign when serializing but ignores it when deserializing a record
+     * field, attempting the record's canonical constructor instead — so
+     * the owning field must carry the annotation itself, as Holder does
+     * here and the states do in the model.
+     */
+    @Test
+    public void fieldLevelAdapterAppliesBothDirections() throws Exception {
+        final Holder holder = new Holder(Assign.builder()
+                .value("courier", "UQS")
+                .expression("product", "$states.input.product")
+                .build());
+
+        final String expected = """
+                {
+                  "Assign": {
+                    "courier": "UQS",
+                    "product": "{% $states.input.product %}"
+                  }
+                }""";
+
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            JsonAsserts.assertJson(expected, jsonb.toJson(holder));
+        }
+
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            assertEquals(holder, jsonb.fromJson(expected, Holder.class));
+        }
+    }
+
+    /**
+     * The adapter runs on deserialization, so an owning object read from
+     * a document with an illegal variable name fails on unmarshal
+     */
+    @Test
+    public void classLevelAdapterValidatesOnRead() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            final Exception failure = assertThrows(Exception.class,
+                    () -> jsonb.fromJson("{\"Assign\":{\"states\":1}}", Holder.class));
+
+            assertTrue(rootCause(failure).getMessage().contains(
+                    "reserved by the States Language"), failure.toString());
+        }
+    }
+
+    @Test
+    public void nullAssignFieldIsOmitted() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            JsonAsserts.assertJson("{}", jsonb.toJson(new Holder(null)));
+        }
+    }
+
+    public record Holder(@JsonbProperty("Assign")
+                         @JsonbTypeAdapter(Assign.Adapter.class) Assign assign) {
+    }
+
+    private Throwable rootCause(final Throwable throwable) {
+        Throwable root = throwable;
+        while (root.getCause() != null) root = root.getCause();
+        return root;
     }
 
     @Test

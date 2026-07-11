@@ -9,6 +9,7 @@
  */
 package com.tomitribe.aureto.states;
 
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.reflections.Reflections;
@@ -115,6 +116,31 @@ public class VerifyConventionsTest {
                 "Builder for %s should be a nested class of %s",
                 clazz.getSimpleName(), clazz.getSimpleName()
         ));
+    }
+
+    /**
+     * Every Assign field carries the field-level @JsonbTypeAdapter.
+     * Johnzon 2.1.0 honors the class-level adapter on Assign when
+     * serializing but ignores it when deserializing a record field, so a
+     * state missing this annotation round-trips asymmetrically: writes
+     * fine, fails to read.
+     */
+    @ParameterizedTest(name = "assignFieldsCarryAdapter - {0}")
+    @MethodSource("classes")
+    public void assignFieldsCarryAdapter(final Class<?> clazz) throws Exception {
+        for (final Field field : clazz.getDeclaredFields()) {
+            if (!Assign.class.equals(field.getType())) continue;
+
+            final JsonbTypeAdapter adapter = field.getAnnotation(JsonbTypeAdapter.class);
+            assertNotNull(adapter, String.format(
+                    "Assign field '%s' in class %s must be annotated"
+                            + " @JsonbTypeAdapter(Assign.Adapter.class): Johnzon ignores the"
+                            + " class-level adapter when deserializing record fields",
+                    field.getName(), clazz.getName()));
+            assertEquals(Assign.Adapter.class, adapter.value(), String.format(
+                    "Assign field '%s' in class %s uses the wrong adapter",
+                    field.getName(), clazz.getName()));
+        }
     }
 
     /**

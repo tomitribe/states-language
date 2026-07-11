@@ -9,9 +9,9 @@
  */
 package com.tomitribe.aureto.states;
 
-import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
 
 /**
@@ -39,10 +39,7 @@ public record WaitState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("Seconds") Integer seconds,
                         @JsonbProperty("Timestamp") String timestamp,
                         @JsonbProperty("Output") JsonValue output,
-                        @JsonbProperty("Assign") JsonObject assign,
+                        @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                         @JsonbProperty("Next") String next,
                         @JsonbProperty("End") Boolean end) implements State {
-    public WaitState {
-        Names.requireValidAssign(assign);
-    }
 }

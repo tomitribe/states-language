@@ -10,9 +10,9 @@
 package com.tomitribe.aureto.states;
 
 import io.github.aglibs.validcheck.ValidCheck;
-import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
 import lombok.Singular;
 
@@ -42,12 +42,11 @@ import java.util.List;
 @Builder(toBuilder = true, builderClassName = "Builder")
 public record Catcher(@JsonbProperty("ErrorEquals") @Singular("error") List<String> errorEquals,
                       @JsonbProperty("Output") JsonValue output,
-                      @JsonbProperty("Assign") JsonObject assign,
+                      @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                       @JsonbProperty("Next") String next) {
     public Catcher {
         errorEquals = errorEquals == null || errorEquals.isEmpty() ? null : List.copyOf(errorEquals);
         ValidCheck.requireNotNull(errorEquals, "errorEquals");
         ValidCheck.requireNotNull(next, "next");
-        Names.requireValidAssign(assign);
     }
 }

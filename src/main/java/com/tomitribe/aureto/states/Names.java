@@ -9,8 +9,6 @@
  */
 package com.tomitribe.aureto.states;
 
-import jakarta.json.JsonObject;
-
 /**
  * States Language naming rules, enforced from the record constructors so
  * both built and unmarshalled machines are checked.  Deliberately not
@@ -41,16 +39,6 @@ final class Names {
                     length, name));
         }
         return name;
-    }
-
-    /**
-     * Asserts every variable named in an "Assign" object satisfies the
-     * variable naming rules.  Null is legal: "Assign" is optional
-     * everywhere it appears.
-     */
-    static void requireValidAssign(final JsonObject assign) {
-        if (assign == null) return;
-        assign.keySet().forEach(Names::requireValidVariableName);
     }
 
     /**

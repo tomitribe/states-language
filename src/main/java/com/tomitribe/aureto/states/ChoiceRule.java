@@ -10,9 +10,9 @@
 package com.tomitribe.aureto.states;
 
 import io.github.aglibs.validcheck.ValidCheck;
-import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
 
 /**
@@ -34,11 +34,10 @@ import lombok.Builder;
 public record ChoiceRule(@JsonbProperty("Comment") String comment,
                          @JsonbProperty("Condition") JsonValue condition,
                          @JsonbProperty("Output") JsonValue output,
-                         @JsonbProperty("Assign") JsonObject assign,
+                         @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                          @JsonbProperty("Next") String next) {
     public ChoiceRule {
         ValidCheck.requireNotNull(condition, "condition");
         ValidCheck.requireNotNull(next, "next");
-        Names.requireValidAssign(assign);
     }
 }

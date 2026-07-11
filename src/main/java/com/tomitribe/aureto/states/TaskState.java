@@ -13,6 +13,7 @@ import io.github.aglibs.validcheck.ValidCheck;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
 import lombok.Singular;
 
@@ -47,7 +48,7 @@ public record TaskState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("Resource") String resource,
                         @JsonbProperty("Arguments") JsonValue arguments,
                         @JsonbProperty("Output") JsonValue output,
-                        @JsonbProperty("Assign") JsonObject assign,
+                        @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                         @JsonbProperty("Retry") @Singular("retrier") List<Retrier> retry,
                         @JsonbProperty("Catch") @Singular("catcher") List<Catcher> catchers,
                         @JsonbProperty("TimeoutSeconds") Integer timeoutSeconds,
@@ -57,7 +58,6 @@ public record TaskState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("End") Boolean end) implements State {
     public TaskState {
         ValidCheck.requireNotNull(resource, "resource");
-        Names.requireValidAssign(assign);
         retry = retry == null || retry.isEmpty() ? null : List.copyOf(retry);
         catchers = catchers == null || catchers.isEmpty() ? null : List.copyOf(catchers);
     }

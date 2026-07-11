@@ -33,7 +33,7 @@ import lombok.Builder;
 @Builder(toBuilder = true, builderClassName = "Builder")
 public record ChoiceRule(@JsonbProperty("Comment") String comment,
                          @JsonbProperty("Condition") JsonValue condition,
-                         @JsonbProperty("Output") JsonValue output,
+                         @JsonbProperty("Output") @JsonbTypeAdapter(Output.Adapter.class) Output output,
                          @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                          @JsonbProperty("Next") String next) {
     public ChoiceRule {

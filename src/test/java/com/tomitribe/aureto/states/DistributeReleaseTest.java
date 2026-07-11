@@ -22,8 +22,8 @@ import java.util.Map;
  */
 class DistributeReleaseTest {
 
-    private static final String ENVELOPE = "{% $merge([$states.input, {'step': $states.context.State.Name}]) %}";
-    private static final String CATCH_ERROR = "{% $merge([$states.input, {'error': $states.errorOutput}]) %}";
+    private static final String ENVELOPE = "$merge([$states.input, {'step': $states.context.State.Name}])";
+    private static final String CATCH_ERROR = "$merge([$states.input, {'error': $states.errorOutput}])";
     private static final String FUNCTION = "arn:aws:lambda:us-east-1:123456789012:function:";
 
     @Test
@@ -31,7 +31,7 @@ class DistributeReleaseTest {
         final TaskState expandCustomers = TaskState.builder()
                 .comment("Produces one item of work per customer entitled to this release")
                 .resource(FUNCTION + "ExpandCustomers")
-                .arguments(Json.createValue(ENVELOPE))
+                .arguments(Arguments.expression(ENVELOPE))
                 .assign(Assign.builder()
                         .expression("product", "$states.input.product")
                         .expression("version", "$states.input.version")
@@ -42,13 +42,13 @@ class DistributeReleaseTest {
 
         final Catcher markFailed = Catcher.builder()
                 .error("States.ALL")
-                .output(Json.createValue(CATCH_ERROR))
+                .output(Output.expression(CATCH_ERROR))
                 .next("MarkFailed")
                 .build();
 
         final TaskState weaveRelease = TaskState.builder()
                 .resource(FUNCTION + "WeaveRelease")
-                .arguments(Json.createValue(ENVELOPE))
+                .arguments(Arguments.expression(ENVELOPE))
                 .retrier(Retrier.builder()
                         .error("States.Timeout")
                         .intervalSeconds(3)
@@ -61,14 +61,14 @@ class DistributeReleaseTest {
 
         final TaskState publishRelease = TaskState.builder()
                 .resource(FUNCTION + "PublishRelease")
-                .arguments(Json.createValue(ENVELOPE))
+                .arguments(Arguments.expression(ENVELOPE))
                 .catcher(markFailed)
                 .end(true)
                 .build();
 
         final TaskState markFailedTask = TaskState.builder()
                 .resource(FUNCTION + "MarkFailed")
-                .arguments(Json.createValue(ENVELOPE))
+                .arguments(Arguments.expression(ENVELOPE))
                 .end(true)
                 .build();
 
@@ -87,10 +87,10 @@ class DistributeReleaseTest {
 
         final TaskState sendSummary = TaskState.builder()
                 .resource(FUNCTION + "SendSummary")
-                .arguments(Json.createObjectBuilder()
-                        .add("step", "{% $states.context.State.Name %}")
-                        .add("total", "{% $count($states.input) %}")
-                        .add("results", "{% $states.input %}")
+                .arguments(Arguments.builder()
+                        .expression("step", "$states.context.State.Name")
+                        .expression("total", "$count($states.input)")
+                        .expression("results", "$states.input")
                         .build())
                 .end(true)
                 .build();

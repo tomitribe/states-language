@@ -10,8 +10,8 @@
 package com.tomitribe.aureto.states;
 
 import io.github.aglibs.validcheck.ValidCheck;
-import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
 
 /**
@@ -26,7 +26,7 @@ import lombok.Builder;
  */
 @Builder(toBuilder = true, builderClassName = "Builder")
 public record ResultWriter(@JsonbProperty("Resource") String resource,
-                           @JsonbProperty("Arguments") JsonValue arguments) {
+                           @JsonbProperty("Arguments") @JsonbTypeAdapter(Arguments.Adapter.class) Arguments arguments) {
     public ResultWriter {
         ValidCheck.requireNotNull(resource, "resource");
     }

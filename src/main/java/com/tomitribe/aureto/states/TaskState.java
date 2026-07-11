@@ -11,7 +11,6 @@ package com.tomitribe.aureto.states;
 
 import io.github.aglibs.validcheck.ValidCheck;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
@@ -46,8 +45,8 @@ import java.util.List;
 public record TaskState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("QueryLanguage") String queryLanguage,
                         @JsonbProperty("Resource") String resource,
-                        @JsonbProperty("Arguments") JsonValue arguments,
-                        @JsonbProperty("Output") JsonValue output,
+                        @JsonbProperty("Arguments") @JsonbTypeAdapter(Arguments.Adapter.class) Arguments arguments,
+                        @JsonbProperty("Output") @JsonbTypeAdapter(Output.Adapter.class) Output output,
                         @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                         @JsonbProperty("Retry") @Singular("retrier") List<Retrier> retry,
                         @JsonbProperty("Catch") @Singular("catcher") List<Catcher> catchers,

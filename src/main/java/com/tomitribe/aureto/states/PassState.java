@@ -9,7 +9,6 @@
  */
 package com.tomitribe.aureto.states;
 
-import jakarta.json.JsonValue;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import lombok.Builder;
@@ -30,7 +29,7 @@ import lombok.Builder;
 @Builder(toBuilder = true, builderClassName = "Builder")
 public record PassState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("QueryLanguage") String queryLanguage,
-                        @JsonbProperty("Output") JsonValue output,
+                        @JsonbProperty("Output") @JsonbTypeAdapter(Output.Adapter.class) Output output,
                         @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                         @JsonbProperty("Next") String next,
                         @JsonbProperty("End") Boolean end) implements State {

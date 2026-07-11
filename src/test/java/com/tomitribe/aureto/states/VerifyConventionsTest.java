@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -119,27 +120,35 @@ public class VerifyConventionsTest {
     }
 
     /**
-     * Every Assign field carries the field-level @JsonbTypeAdapter.
-     * Johnzon 2.1.0 honors the class-level adapter on Assign when
-     * serializing but ignores it when deserializing a record field, so a
+     * Every field of an adapted type carries its field-level
+     * @JsonbTypeAdapter.  Johnzon 2.1.0 honors class-level adapters when
+     * serializing but ignores them when deserializing a record field, so a
      * state missing this annotation round-trips asymmetrically: writes
      * fine, fails to read.
      */
-    @ParameterizedTest(name = "assignFieldsCarryAdapter - {0}")
+    @ParameterizedTest(name = "adaptedFieldsCarryAdapter - {0}")
     @MethodSource("classes")
-    public void assignFieldsCarryAdapter(final Class<?> clazz) throws Exception {
+    public void adaptedFieldsCarryAdapter(final Class<?> clazz) throws Exception {
+        final Map<Class<?>, Class<?>> adapters = Map.of(
+                Assign.class, Assign.Adapter.class,
+                Arguments.class, Arguments.Adapter.class,
+                Output.class, Output.Adapter.class
+        );
+
         for (final Field field : clazz.getDeclaredFields()) {
-            if (!Assign.class.equals(field.getType())) continue;
+            final Class<?> adapterClass = adapters.get(field.getType());
+            if (adapterClass == null) continue;
 
             final JsonbTypeAdapter adapter = field.getAnnotation(JsonbTypeAdapter.class);
             assertNotNull(adapter, String.format(
-                    "Assign field '%s' in class %s must be annotated"
-                            + " @JsonbTypeAdapter(Assign.Adapter.class): Johnzon ignores the"
-                            + " class-level adapter when deserializing record fields",
-                    field.getName(), clazz.getName()));
-            assertEquals(Assign.Adapter.class, adapter.value(), String.format(
-                    "Assign field '%s' in class %s uses the wrong adapter",
-                    field.getName(), clazz.getName()));
+                    "%s field '%s' in class %s must be annotated"
+                            + " @JsonbTypeAdapter(%s.class): Johnzon ignores"
+                            + " class-level adapters when deserializing record fields",
+                    field.getType().getSimpleName(), field.getName(), clazz.getName(),
+                    adapterClass.getName()));
+            assertEquals(adapterClass, adapter.value(), String.format(
+                    "%s field '%s' in class %s uses the wrong adapter",
+                    field.getType().getSimpleName(), field.getName(), clazz.getName()));
         }
     }
 

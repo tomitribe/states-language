@@ -48,6 +48,10 @@ public record Retrier(@JsonbProperty("ErrorEquals") @Singular("error") List<Stri
     public Retrier {
         errorEquals = errorEquals == null || errorEquals.isEmpty() ? null : List.copyOf(errorEquals);
         ValidCheck.requireNotNull(errorEquals, "errorEquals");
+        Rules.requirePositive("IntervalSeconds", intervalSeconds);
+        Rules.requireNonNegative("MaxAttempts", maxAttempts);
+        Rules.requirePositive("MaxDelaySeconds", maxDelaySeconds);
+        Rules.requireMinimum("BackoffRate", backoffRate, 1.0);
     }
 
     /**

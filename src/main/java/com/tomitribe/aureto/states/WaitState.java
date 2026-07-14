@@ -41,4 +41,12 @@ public record WaitState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                         @JsonbProperty("Next") String next,
                         @JsonbProperty("End") Boolean end) implements State {
+    public WaitState {
+        Rules.requireTransition(WaitState.class, next, end);
+        if ((seconds == null) == (timestamp == null)) {
+            throw new IllegalArgumentException(
+                    "WaitState must have exactly one of \"Seconds\" or \"Timestamp\"");
+        }
+        Rules.requireNonNegative("Seconds", seconds);
+    }
 }

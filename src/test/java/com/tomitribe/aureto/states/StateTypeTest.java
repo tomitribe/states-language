@@ -50,17 +50,17 @@ class StateTypeTest {
 
     private List<State> states() {
         return List.of(
-                TaskState.builder().resource("arn:test").build(),
+                TaskState.builder().resource("arn:test").end(true).build(),
                 ParallelState.builder().branch(Branch.builder()
                         .startAt("A")
                         .states(Map.of())
-                        .build()).build(),
+                        .build()).end(true).build(),
                 MapState.builder().itemProcessor(ItemProcessor.builder()
                         .startAt("A")
                         .states(Map.of())
-                        .build()).build(),
-                PassState.builder().build(),
-                WaitState.builder().seconds(1).build(),
+                        .build()).end(true).build(),
+                PassState.builder().end(true).build(),
+                WaitState.builder().seconds(1).end(true).build(),
                 ChoiceState.builder().choice(ChoiceRule.builder()
                         .condition(Condition.of(true))
                         .next("A")

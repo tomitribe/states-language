@@ -67,6 +67,10 @@ public record MapState(@JsonbProperty("Comment") String comment,
                        @JsonbProperty("End") Boolean end) implements State {
     public MapState {
         ValidCheck.requireNotNull(itemProcessor, "itemProcessor");
+        Rules.requireTransition(MapState.class, next, end);
+        Rules.requireNonNegative("MaxConcurrency", maxConcurrency);
+        Rules.requireNonNegative("ToleratedFailureCount", toleratedFailureCount);
+        Rules.requirePercentage("ToleratedFailurePercentage", toleratedFailurePercentage);
         retry = retry == null || retry.isEmpty() ? null : List.copyOf(retry);
         catchers = catchers == null || catchers.isEmpty() ? null : List.copyOf(catchers);
     }

@@ -33,4 +33,7 @@ public record PassState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("Assign") @JsonbTypeAdapter(Assign.Adapter.class) Assign assign,
                         @JsonbProperty("Next") String next,
                         @JsonbProperty("End") Boolean end) implements State {
+    public PassState {
+        Rules.requireTransition(PassState.class, next, end);
+    }
 }

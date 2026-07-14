@@ -28,4 +28,12 @@ import lombok.Builder;
 public record ItemBatcher(@JsonbProperty("BatchInput") @JsonbTypeAdapter(BatchInput.Adapter.class) BatchInput batchInput,
                           @JsonbProperty("MaxItemsPerBatch") Integer maxItemsPerBatch,
                           @JsonbProperty("MaxInputBytesPerBatch") Integer maxInputBytesPerBatch) {
+    public ItemBatcher {
+        if (maxItemsPerBatch == null && maxInputBytesPerBatch == null) {
+            throw new IllegalArgumentException(
+                    "ItemBatcher must have at least one of \"MaxItemsPerBatch\" or \"MaxInputBytesPerBatch\"");
+        }
+        Rules.requirePositive("MaxItemsPerBatch", maxItemsPerBatch);
+        Rules.requirePositive("MaxInputBytesPerBatch", maxInputBytesPerBatch);
+    }
 }

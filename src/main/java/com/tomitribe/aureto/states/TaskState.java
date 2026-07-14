@@ -58,6 +58,14 @@ public record TaskState(@JsonbProperty("Comment") String comment,
                         @JsonbProperty("End") Boolean end) implements State {
     public TaskState {
         ValidCheck.requireNotNull(resource, "resource");
+        Rules.requireTransition(TaskState.class, next, end);
+        Rules.requirePositive("TimeoutSeconds", timeoutSeconds);
+        Rules.requirePositive("HeartbeatSeconds", heartbeatSeconds);
+        if (timeoutSeconds != null && heartbeatSeconds != null && heartbeatSeconds >= timeoutSeconds) {
+            throw new IllegalArgumentException(String.format(
+                    "\"HeartbeatSeconds\" (%s) must be smaller than \"TimeoutSeconds\" (%s)",
+                    heartbeatSeconds, timeoutSeconds));
+        }
         retry = retry == null || retry.isEmpty() ? null : List.copyOf(retry);
         catchers = catchers == null || catchers.isEmpty() ? null : List.copyOf(catchers);
     }

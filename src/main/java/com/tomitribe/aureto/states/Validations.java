@@ -17,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * The whole-document States Language rules, reachable through
@@ -115,6 +116,17 @@ final class Validations {
                     }
                     variables.putIfAbsent(variable, statePath);
                 }
+            }
+
+            if (state instanceof TaskState task) {
+                duplicateErrors("Retry", errorLists(task.retry(), Retrier::errorEquals), statePath, findings);
+                duplicateErrors("Catch", errorLists(task.catchers(), Catcher::errorEquals), statePath, findings);
+            } else if (state instanceof ParallelState parallel) {
+                duplicateErrors("Retry", errorLists(parallel.retry(), Retrier::errorEquals), statePath, findings);
+                duplicateErrors("Catch", errorLists(parallel.catchers(), Catcher::errorEquals), statePath, findings);
+            } else if (state instanceof MapState map) {
+                duplicateErrors("Retry", errorLists(map.retry(), Retrier::errorEquals), statePath, findings);
+                duplicateErrors("Catch", errorLists(map.catchers(), Catcher::errorEquals), statePath, findings);
             }
 
             if (state instanceof ChoiceState choice && choice.defaultState() == null) {
@@ -240,6 +252,34 @@ final class Validations {
 
     private static void add(final List<Assign> assigns, final Assign assign) {
         if (assign != null) assigns.add(assign);
+    }
+
+    private static <T> List<List<String>> errorLists(final List<T> entries,
+                                                     final Function<T, List<String>> errors) {
+        if (entries == null) return List.of();
+        return entries.stream().map(errors).toList();
+    }
+
+    /**
+     * The interpreter uses the first Retrier or Catcher matching an error
+     * name, and an exhausted Retrier falls through to Catch rather than to
+     * later Retriers — so a repeated name is legal but dead
+     */
+    private static void duplicateErrors(final String field, final List<List<String>> entries,
+                                        final String statePath, final Validation.Builder findings) {
+        final Map<String, Integer> seen = new LinkedHashMap<>();
+        for (int i = 0; i < entries.size(); i++) {
+            for (final String error : entries.get(i)) {
+                final Integer first = seen.putIfAbsent(error, i);
+                if (first == null) continue;
+                findings.finding(Finding.warning(statePath, first == i
+                        ? String.format("\"%s\" is listed twice in %s[%s].\"ErrorEquals\"",
+                                error, field, i)
+                        : String.format("\"%s\" in %s[%s] is unreachable: %s[%s] already matches it,"
+                                        + " and the interpreter uses the first match",
+                                error, field, i, field, first)));
+            }
+        }
     }
 
     private static Set<String> unreachable(final String startAt, final Map<String, State> states) {

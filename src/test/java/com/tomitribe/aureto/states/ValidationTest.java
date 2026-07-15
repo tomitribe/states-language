@@ -202,6 +202,33 @@ class ValidationTest {
                 + " must be a JSON array", validation.warnings().get(0).message());
     }
 
+    /**
+     * The interpreter uses the first matching Retrier or Catcher, and an
+     * exhausted Retrier falls through to Catch, not to later Retriers —
+     * so a repeated error name is legal but dead
+     */
+    @Test
+    public void duplicateErrorNamesWarn() {
+        final Validation validation = machine("Work", Map.of("Work", TaskState.builder()
+                .resource("arn:test")
+                .retrier(Retrier.builder().error(Errors.States.TIMEOUT).maxAttempts(2).build())
+                .retrier(Retrier.builder().error(Errors.States.TIMEOUT).maxAttempts(5).build())
+                .catcher(Catcher.builder()
+                        .error(Errors.States.TASK_FAILED)
+                        .error(Errors.States.TASK_FAILED)
+                        .next("Work")
+                        .build())
+                .end(true)
+                .build())).validate();
+
+        assertTrue(validation.isValid());
+        assertEquals(2, validation.warnings().size());
+        assertEquals("\"States.Timeout\" in Retry[1] is unreachable: Retry[0] already matches it,"
+                + " and the interpreter uses the first match", validation.warnings().get(0).message());
+        assertEquals("\"States.TaskFailed\" is listed twice in Catch[0].\"ErrorEquals\"",
+                validation.warnings().get(1).message());
+    }
+
     @Test
     public void requireValidReportsEveryError() {
         final StateMachine machine = machine("Nope", Map.of("A", pass("B")));

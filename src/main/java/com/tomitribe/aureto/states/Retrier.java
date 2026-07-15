@@ -100,7 +100,7 @@ public record Retrier(@JsonbProperty("ErrorEquals") @Singular("error") List<Stri
     public interface JitterStrategy {
 
         /**
-         * The computed retry interval is used as is
+         * The computed retry interval is used as is; the AWS default
          */
         String NONE = "NONE";
 

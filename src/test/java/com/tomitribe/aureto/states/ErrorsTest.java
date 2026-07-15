@@ -29,18 +29,21 @@ class ErrorsTest {
     @Test
     public void prefixesAndUniqueness() throws Exception {
         final List<String> states = values(Errors.States.class);
+        final List<String> http = values(Errors.States.Http.class);
         final List<String> lambda = values(Errors.Lambda.class);
         final List<String> sandbox = values(Errors.Sandbox.class);
 
         states.forEach(value -> assertTrue(value.startsWith("States."), value));
+        http.forEach(value -> assertTrue(value.startsWith("States.Http."), value));
         lambda.forEach(value -> assertTrue(value.startsWith("Lambda."), value));
         sandbox.forEach(value -> assertTrue(value.startsWith("Sandbox."), value));
 
         assertEquals(16, states.size());
+        assertEquals(10, http.size());
         assertEquals(47, lambda.size());
         assertEquals(1, sandbox.size());
 
-        final List<String> all = Stream.of(states, lambda, sandbox).flatMap(List::stream).toList();
+        final List<String> all = Stream.of(states, http, lambda, sandbox).flatMap(List::stream).toList();
         assertEquals(all.size(), all.stream().distinct().count(), "duplicate error name");
     }
 
@@ -53,6 +56,9 @@ class ErrorsTest {
         assertEquals("Lambda.EC2ThrottledException", Errors.Lambda.EC2_THROTTLED_EXCEPTION);
         assertEquals("Lambda.SnapStartTimeoutException", Errors.Lambda.SNAP_START_TIMEOUT_EXCEPTION);
         assertEquals("Sandbox.Timedout", Errors.Sandbox.TIMEDOUT);
+        assertEquals("States.Http.Socket", Errors.States.Http.SOCKET);
+        assertEquals("States.Http.StatusCode.429", Errors.States.Http.STATUS_CODE_429);
+        assertEquals("States.Http.StatusCode.418", Errors.States.Http.statusCode(418));
     }
 
     private List<String> values(final Class<?> constants) throws Exception {

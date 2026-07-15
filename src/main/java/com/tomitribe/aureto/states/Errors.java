@@ -53,7 +53,9 @@ public interface Errors {
         String HEARTBEAT_TIMEOUT = "States.HeartbeatTimeout";
 
         /**
-         * A Task State failed during execution
+         * A Task State failed during execution.  On AWS, when used in a
+         * Retry or Catch this acts as a wildcard matching any known error
+         * name except {@link #TIMEOUT} — a narrower net than {@link #ALL}.
          */
         String TASK_FAILED = "States.TaskFailed";
 
@@ -128,10 +130,45 @@ public interface Errors {
 
         /**
          * AWS-defined, not in the specification: a state's input or
-         * output exceeded the 256KB payload quota.  A terminal error
-         * {@link #ALL} does not match.
+         * output exceeded the 256KB payload quota.  {@link #ALL} does not
+         * match it, but it can be retried or caught by naming it
+         * explicitly in "ErrorEquals".
          */
         String DATA_LIMIT_EXCEEDED = "States.DataLimitExceeded";
+
+        /**
+         * The "States.Http." error names an HTTP Task reports when
+         * calling third-party APIs.  AWS-defined, not in the
+         * specification.
+         *
+         * @see <a href="https://docs.aws.amazon.com/step-functions/latest/dg/call-https-apis.html">Call HTTPS APIs</a>
+         */
+        interface Http {
+
+            /**
+             * The HTTP task timed out after 60 seconds
+             */
+            String SOCKET = "States.Http.Socket";
+
+            String STATUS_CODE_400 = "States.Http.StatusCode.400";
+            String STATUS_CODE_401 = "States.Http.StatusCode.401";
+            String STATUS_CODE_404 = "States.Http.StatusCode.404";
+            String STATUS_CODE_409 = "States.Http.StatusCode.409";
+            String STATUS_CODE_429 = "States.Http.StatusCode.429";
+            String STATUS_CODE_500 = "States.Http.StatusCode.500";
+            String STATUS_CODE_502 = "States.Http.StatusCode.502";
+            String STATUS_CODE_503 = "States.Http.StatusCode.503";
+            String STATUS_CODE_504 = "States.Http.StatusCode.504";
+
+            /**
+             * The error name for any HTTP status, following the
+             * "States.Http.StatusCode.&lt;code&gt;" pattern the documented
+             * constants use
+             */
+            static String statusCode(final int code) {
+                return "States.Http.StatusCode." + code;
+            }
+        }
     }
 
     /**

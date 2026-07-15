@@ -40,7 +40,7 @@ class DistributeReleaseTest {
                 .build();
 
         final Catcher markFailed = Catcher.builder()
-                .error("States.ALL")
+                .error(Errors.States.ALL)
                 .output(Output.expression(CATCH_ERROR))
                 .next("MarkFailed")
                 .build();
@@ -49,7 +49,7 @@ class DistributeReleaseTest {
                 .resource(FUNCTION + "WeaveRelease")
                 .arguments(Arguments.expression(ENVELOPE))
                 .retrier(Retrier.builder()
-                        .error("States.Timeout")
+                        .error(Errors.States.TIMEOUT)
                         .intervalSeconds(3)
                         .maxAttempts(2)
                         .backoffRate(2.0)

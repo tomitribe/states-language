@@ -28,7 +28,8 @@ import java.util.List;
  * "java.lang.Exception" does not catch subclasses.  The reserved name
  * "States.ALL" matches any error and must appear alone in the last Retrier.
  *
- * @param errorEquals error names this Retrier matches; required, non-empty
+ * @param errorEquals error names this Retrier matches; required, non-empty;
+ *                    the predefined names are constants on {@link Errors}
  * @param intervalSeconds seconds before the first retry, default 1
  * @param maxAttempts maximum retries, default 3; zero — readable as
  *                    {@link MaxAttempts#NEVER} — is legal and means never retry

@@ -27,7 +27,7 @@ class RetrierTest {
     @Test
     public void maxAttemptsNever() throws Exception {
         final Retrier retrier = Retrier.builder()
-                .error("States.Timeout")
+                .error(Errors.States.TIMEOUT)
                 .maxAttempts(MaxAttempts.NEVER)
                 .build();
 

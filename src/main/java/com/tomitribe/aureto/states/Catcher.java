@@ -32,7 +32,8 @@ import java.util.List;
  * name "States.ALL" matches any error and must appear alone in the last
  * Catcher.
  *
- * @param errorEquals error names this Catcher matches; required, non-empty
+ * @param errorEquals error names this Catcher matches; required, non-empty;
+ *                    the predefined names are constants on {@link Errors}
  * @param output the state output; a JSON value or a JSONata string, may reference $states.errorOutput
  * @param assign variable assignments evaluated instead of the state's top-level assign
  * @param next name of the state to transition to; required

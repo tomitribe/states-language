@@ -73,5 +73,6 @@ public record MapState(@JsonbProperty("Comment") String comment,
         Rules.requirePercentage("ToleratedFailurePercentage", toleratedFailurePercentage);
         retry = retry == null || retry.isEmpty() ? null : List.copyOf(retry);
         catchers = catchers == null || catchers.isEmpty() ? null : List.copyOf(catchers);
+        Rules.requireStatesAllPlacement(retry, catchers);
     }
 }

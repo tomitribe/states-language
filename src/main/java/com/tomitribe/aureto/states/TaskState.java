@@ -68,6 +68,7 @@ public record TaskState(@JsonbProperty("Comment") String comment,
         }
         retry = retry == null || retry.isEmpty() ? null : List.copyOf(retry);
         catchers = catchers == null || catchers.isEmpty() ? null : List.copyOf(catchers);
+        Rules.requireStatesAllPlacement(retry, catchers);
     }
 
     public static class Builder {

@@ -9,6 +9,8 @@
  */
 package com.tomitribe.aureto.states;
 
+import java.util.List;
+
 /**
  * The States Language MUST rules that are decidable from a single object's
  * own fields, enforced from the record constructors so both built and
@@ -70,5 +72,40 @@ final class Rules {
                     "\"%s\" must be greater than or equal to %s: %s", field, minimum, value));
         }
         return value;
+    }
+
+    static void requireStatesAllPlacement(final List<Retrier> retry, final List<Catcher> catchers) {
+        if (retry != null) {
+            requireStatesAllPlacement("Retrier", "Retry",
+                    retry.stream().map(Retrier::errorEquals).toList());
+        }
+        if (catchers != null) {
+            requireStatesAllPlacement("Catcher", "Catch",
+                    catchers.stream().map(Catcher::errorEquals).toList());
+        }
+    }
+
+    /**
+     * "States.ALL" must appear alone in its "ErrorEquals" array and only
+     * in the last Retrier or Catcher of the list
+     */
+    private static void requireStatesAllPlacement(final String entryNoun, final String field,
+                                          final List<List<String>> errorEquals) {
+        if (errorEquals == null) return;
+        for (int i = 0; i < errorEquals.size(); i++) {
+            final List<String> errors = errorEquals.get(i);
+            if (!errors.contains(Errors.States.ALL)) continue;
+
+            if (errors.size() > 1) {
+                throw new IllegalArgumentException(String.format(
+                        "\"States.ALL\" must appear alone in \"ErrorEquals\": %s", errors));
+            }
+            if (i != errorEquals.size() - 1) {
+                throw new IllegalArgumentException(String.format(
+                        "The \"States.ALL\" %s must be the last entry in \"%s\";"
+                                + " it is entry %s of %s",
+                        entryNoun, field, i + 1, errorEquals.size()));
+            }
+        }
     }
 }

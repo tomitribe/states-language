@@ -100,6 +100,31 @@ class RequiredFieldsTest {
                 .maxItemsPerBatch(0).build());
     }
 
+    /**
+     * "States.ALL" must appear alone in its "ErrorEquals" array and only
+     * as the last Retrier or Catcher
+     */
+    @Test
+    public void statesAllMustBeAloneAndLast() {
+        final IllegalArgumentException alone = assertThrows(IllegalArgumentException.class,
+                () -> TaskState.builder().resource("arn:test").end(true)
+                        .retrier(Retrier.builder()
+                                .error(Errors.States.ALL)
+                                .error(Errors.States.TIMEOUT)
+                                .build())
+                        .build());
+        assertEquals("\"States.ALL\" must appear alone in \"ErrorEquals\":"
+                + " [States.ALL, States.Timeout]", alone.getMessage());
+
+        final IllegalArgumentException last = assertThrows(IllegalArgumentException.class,
+                () -> TaskState.builder().resource("arn:test").end(true)
+                        .catcher(Catcher.builder().error(Errors.States.ALL).next("A").build())
+                        .catcher(Catcher.builder().error(Errors.States.TIMEOUT).next("A").build())
+                        .build());
+        assertEquals("The \"States.ALL\" Catcher must be the last entry in \"Catch\";"
+                + " it is entry 1 of 2", last.getMessage());
+    }
+
     @Test
     public void retrierValueRules() {
         assertThrows(IllegalArgumentException.class, () -> Retrier.builder()

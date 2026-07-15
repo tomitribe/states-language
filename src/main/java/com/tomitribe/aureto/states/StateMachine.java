@@ -11,6 +11,7 @@ package com.tomitribe.aureto.states;
 
 import io.github.aglibs.validcheck.ValidCheck;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTransient;
 import lombok.Builder;
 
 import java.util.Map;
@@ -40,5 +41,18 @@ public record StateMachine(@JsonbProperty("Comment") String comment,
         ValidCheck.requireNotNull(startAt, "startAt");
         ValidCheck.requireNotNull(states, "states");
         states.keySet().forEach(Names::requireValidStateName);
+    }
+
+    /**
+     * Checks the whole-document rules the record constructors cannot:
+     * transition targets resolve within their own scope, state names are
+     * unique across the entire machine, variables do not shadow outer
+     * scopes, the effective query language is JSONata, and the
+     * runtime-risk warnings.  Chain {@link Validation#requireValid()} to
+     * fail fast: {@code machine.validate().requireValid()}
+     */
+    @JsonbTransient
+    public Validation validate() {
+        return Validations.validate(this);
     }
 }

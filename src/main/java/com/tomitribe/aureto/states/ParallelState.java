@@ -54,5 +54,6 @@ public record ParallelState(@JsonbProperty("Comment") String comment,
         Rules.requireTransition(ParallelState.class, next, end);
         retry = retry == null || retry.isEmpty() ? null : List.copyOf(retry);
         catchers = catchers == null || catchers.isEmpty() ? null : List.copyOf(catchers);
+        Rules.requireStatesAllPlacement(retry, catchers);
     }
 }

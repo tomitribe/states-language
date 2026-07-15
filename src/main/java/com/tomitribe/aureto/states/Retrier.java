@@ -56,6 +56,33 @@ public record Retrier(@JsonbProperty("ErrorEquals") @Singular("error") List<Stri
     }
 
     /**
+     * AWS's recommended retry policy for transient Lambda service
+     * exceptions — the failures where nothing is wrong with the function,
+     * the service hiccuped — plus
+     * {@link Errors.Lambda#TOO_MANY_REQUESTS_EXCEPTION}, which AWS's
+     * published snippet omits despite throttling being the most common
+     * transient of all.  Waits of 2, 4, 8, 16, 32, and 64 seconds: six
+     * attempts across about two minutes.
+     *
+     * Use as-is, or as a template:
+     * {@code Retrier.LAMBDA_TRANSIENT.toBuilder().maxAttempts(3).build()}.
+     * Retriers are scanned in order, so place this before any broader
+     * Retrier, and "States.ALL" must remain last.
+     *
+     * @see <a href="https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html#bp-lambda-serviceexception">Handle transient Lambda service exceptions</a>
+     */
+    public static final Retrier LAMBDA_TRANSIENT = Retrier.builder()
+            .error(Errors.Lambda.CLIENT_EXECUTION_TIMEOUT_EXCEPTION)
+            .error(Errors.Lambda.SERVICE_EXCEPTION)
+            .error(Errors.Lambda.AWS_LAMBDA_EXCEPTION)
+            .error(Errors.Lambda.SDK_CLIENT_EXCEPTION)
+            .error(Errors.Lambda.TOO_MANY_REQUESTS_EXCEPTION)
+            .intervalSeconds(2)
+            .maxAttempts(6)
+            .backoffRate(2.0)
+            .build();
+
+    /**
      * Named values for the "MaxAttempts" field.  The spec notes a value of
      * zero is legal, specifying that some error or errors should never be
      * retried — {@code maxAttempts(MaxAttempts.NEVER)} says so in code.

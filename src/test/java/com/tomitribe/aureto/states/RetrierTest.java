@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * The named Retrier values: MaxAttempts.NEVER for the spec's
  * zero-means-never-retry rule, and the AWS-defined jitter strategies.
@@ -38,6 +40,40 @@ class RetrierTest {
                       "MaxAttempts": 0
                     }""", jsonb.toJson(retrier));
         }
+    }
+
+    @Test
+    public void lambdaTransient() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            JsonAsserts.assertJson("""
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ClientExecutionTimeoutException",
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2.0
+                    }""", jsonb.toJson(Retrier.LAMBDA_TRANSIENT));
+        }
+    }
+
+    /**
+     * The constant doubles as a template: tweak through toBuilder()
+     * without disturbing the shared instance
+     */
+    @Test
+    public void lambdaTransientIsATemplate() {
+        final Retrier tweaked = Retrier.LAMBDA_TRANSIENT.toBuilder()
+                .maxAttempts(3)
+                .build();
+
+        assertEquals(3, tweaked.maxAttempts());
+        assertEquals(5, tweaked.errorEquals().size());
+        assertEquals(6, Retrier.LAMBDA_TRANSIENT.maxAttempts());
     }
 
     @Test

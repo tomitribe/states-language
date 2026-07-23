@@ -24,7 +24,7 @@
 
   <groupId>org.tomitribe.aws.states</groupId>
   <artifactId>states-language</artifactId>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.3</version>
   <packaging>jar</packaging>
   <name>States Language</name>
   <description>Java model, builders, and validator for the Amazon States Language (AWS Step Functions), JSONata dialect</description>
@@ -34,7 +34,7 @@
     <connection>scm:git:git@github.com:tomitribe/states-language.git</connection>
     <developerConnection>scm:git:git@github.com:tomitribe/states-language.git</developerConnection>
     <url>https://github.com/tomitribe/states-language</url>
-    <tag>HEAD</tag>
+    <tag>states-language-0.3</tag>
   </scm>
 
   <properties>

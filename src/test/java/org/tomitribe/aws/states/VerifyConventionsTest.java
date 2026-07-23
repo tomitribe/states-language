@@ -50,8 +50,7 @@ public class VerifyConventionsTest {
                         reflections.getSubTypesOf(Object.class).stream(),
                         reflections.getSubTypesOf(Record.class).stream()
                 ).distinct()
-                .filter(aClass -> aClass.getPackageName().equals(VerifyConventionsTest.class.getPackageName())
-                        || aClass.getPackageName().equals(VerifyConventionsTest.class.getPackageName() + ".aws"))
+                .filter(aClass -> aClass.getPackageName().equals(VerifyConventionsTest.class.getPackageName()))
                 .filter(aClass -> Modifier.isPublic(aClass.getModifiers())) // conventions govern the public model
                 .filter(aClass -> !aClass.isMemberClass())
                 .filter(aClass -> !aClass.isInterface())

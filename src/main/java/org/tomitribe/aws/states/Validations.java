@@ -40,10 +40,10 @@ final class Validations {
     }
 
     static Validation validate(final StateMachine machine) {
-        final Validation.Builder findings = Validation.builder();
+        final List<Finding> findings = new ArrayList<>();
 
         if (!"JSONata".equals(machine.queryLanguage())) {
-            findings.finding(Finding.error("QueryLanguage", machine.queryLanguage() == null
+            findings.add(Finding.error("QueryLanguage", machine.queryLanguage() == null
                     ? "\"QueryLanguage\" is absent, so the machine defaults to JSONPath; this model"
                         + " writes JSONata fields.  Set queryLanguage(\"JSONata\")"
                     : String.format("\"QueryLanguage\" is \"%s\"; this model writes JSONata fields."
@@ -54,7 +54,7 @@ final class Validations {
         index(machine.states(), "States", index);
         index.forEach((name, paths) -> {
             if (paths.size() > 1) {
-                findings.finding(Finding.error(paths.get(1), String.format(
+                findings.add(Finding.error(paths.get(1), String.format(
                         "State name \"%s\" is defined %s times: %s."
                                 + "  State names must be unique within the entire state machine",
                         name, paths.size(), String.join(", ", paths))));
@@ -63,7 +63,7 @@ final class Validations {
 
         scope(machine.startAt(), machine.states(), "States", "StartAt", Map.of(), index, findings);
 
-        return findings.build();
+        return new Validation(findings);
     }
 
     private static void index(final Map<String, State> states, final String path,
@@ -88,9 +88,9 @@ final class Validations {
                               final String path, final String startAtPath,
                               final Map<String, String> outerVariables,
                               final Map<String, List<String>> index,
-                              final Validation.Builder findings) {
+                              final List<Finding> findings) {
         if (!states.containsKey(startAt)) {
-            findings.finding(Finding.error(startAtPath, String.format(
+            findings.add(Finding.error(startAtPath, String.format(
                     "\"StartAt\": \"%s\" does not match any state in %s.  States present: %s",
                     startAt, path, String.join(", ", states.keySet()))));
         }
@@ -101,7 +101,7 @@ final class Validations {
             final String statePath = path + "." + name;
 
             if (state.queryLanguage() != null && !"JSONata".equals(state.queryLanguage())) {
-                findings.finding(Finding.error(statePath, String.format(
+                findings.add(Finding.error(statePath, String.format(
                         "\"QueryLanguage\": \"%s\" overrides the machine's query language; this"
                                 + " model writes JSONata fields", state.queryLanguage())));
             }
@@ -113,7 +113,7 @@ final class Validations {
                 for (final String variable : assign.names()) {
                     final String outer = outerVariables.get(variable);
                     if (outer != null) {
-                        findings.finding(Finding.error(statePath, String.format(
+                        findings.add(Finding.error(statePath, String.format(
                                 "Variable \"%s\" is already assigned in the outer scope at %s."
                                         + "  Outer and inner variable names must be unique",
                                 variable, outer)));
@@ -134,19 +134,19 @@ final class Validations {
             }
 
             if (state instanceof ChoiceState choice && choice.defaultState() == null) {
-                findings.finding(Finding.warning(statePath,
+                findings.add(Finding.warning(statePath,
                         "No \"Default\"; if no Choice Rule matches, the machine fails with"
                                 + " States.NoChoiceMatched.  Add a \"Default\" or a final rule"
                                 + " with a true Condition"));
             }
             if (state instanceof MapState map && map.items() == null && map.itemReader() == null) {
-                findings.finding(Finding.warning(statePath,
+                findings.add(Finding.warning(statePath,
                         "Neither \"Items\" nor \"ItemReader\"; at runtime the state input"
                                 + " must be a JSON array"));
             }
         });
 
-        unreachable(startAt, states).forEach(name -> findings.finding(Finding.warning(
+        unreachable(startAt, states).forEach(name -> findings.add(Finding.warning(
                 path + "." + name,
                 "Unreachable; no transition targets it and it is not the \"StartAt\"")));
 
@@ -174,17 +174,17 @@ final class Validations {
     private static void checkTarget(final String field, final String target, final String statePath,
                                     final Map<String, State> states,
                                     final Map<String, List<String>> index,
-                                    final Validation.Builder findings) {
+                                    final List<Finding> findings) {
         if (states.containsKey(target)) return;
 
         final List<String> elsewhere = index.get(target);
         if (elsewhere != null) {
-            findings.finding(Finding.error(statePath, String.format(
+            findings.add(Finding.error(statePath, String.format(
                     "\"%s\": \"%s\" targets a state outside its own \"States\" field (defined at %s)."
                             + "  States may only transition within their own scope",
                     field, target, String.join(", ", elsewhere))));
         } else {
-            findings.finding(Finding.error(statePath, String.format(
+            findings.add(Finding.error(statePath, String.format(
                     "\"%s\": \"%s\" does not match any state.  States present in this scope: %s",
                     field, target, String.join(", ", states.keySet()))));
         }
@@ -270,13 +270,13 @@ final class Validations {
      * later Retriers — so a repeated name is legal but dead
      */
     private static void duplicateErrors(final String field, final List<List<String>> entries,
-                                        final String statePath, final Validation.Builder findings) {
+                                        final String statePath, final List<Finding> findings) {
         final Map<String, Integer> seen = new LinkedHashMap<>();
         for (int i = 0; i < entries.size(); i++) {
             for (final String error : entries.get(i)) {
                 final Integer first = seen.putIfAbsent(error, i);
                 if (first == null) continue;
-                findings.finding(Finding.warning(statePath, first == i
+                findings.add(Finding.warning(statePath, first == i
                         ? String.format("\"%s\" is listed twice in %s[%s].\"ErrorEquals\"",
                                 error, field, i)
                         : String.format("\"%s\" in %s[%s] is unreachable: %s[%s] already matches it,"

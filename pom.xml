@@ -1,28 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Tomitribe Confidential
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-  Copyright Tomitribe Corporation. 2026
+      http://www.apache.org/licenses/LICENSE-2.0
 
-  The source code for this program is not published or otherwise divested
-  of its trade secrets, irrespective of what has been deposited with the
-  U.S. Copyright Office.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.tomitribe</groupId>
-    <artifactId>tomitribe-parent</artifactId>
-    <version>19</version>
+    <groupId>org.tomitribe</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>13</version>
   </parent>
 
-  <groupId>com.tomitribe.aureto</groupId>
-  <artifactId>aureto-states</artifactId>
+  <groupId>org.tomitribe.aws.states</groupId>
+  <artifactId>states-language</artifactId>
   <version>0.3-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>Aureto :: States</name>
-  <url>http://www.tomitribe.com</url>
+  <name>States Language</name>
+  <description>Java model, builders, and validator for the Amazon States Language (AWS Step Functions), JSONata dialect</description>
+  <url>https://github.com/tomitribe/states-language</url>
+
+  <scm>
+    <connection>scm:git:git@github.com:tomitribe/states-language.git</connection>
+    <developerConnection>scm:git:git@github.com:tomitribe/states-language.git</developerConnection>
+    <url>https://github.com/tomitribe/states-language</url>
+    <tag>HEAD</tag>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -114,13 +127,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>tomitribe-all</id>
-      <name>Tomitribe Repository</name>
-      <url>https://repository.tomitribe.com/content/groups/tomitribe/</url>
-    </repository>
-  </repositories>
 
 </project>

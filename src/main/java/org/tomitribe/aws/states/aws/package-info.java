@@ -1,0 +1,24 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * AWS's definitions of the runtime values the States Language leaves to
+ * the interpreter: the Context Object and friends.  These are the shapes
+ * a task's code reads at execution time, as opposed to the document model
+ * one package up, which is the shape a state machine is written in.
+ */
+@JsonbVisibility(ModelVisibility.class)
+package org.tomitribe.aws.states.aws;
+
+import org.tomitribe.aws.states.jsonb.ModelVisibility;
+import jakarta.json.bind.annotation.JsonbVisibility;

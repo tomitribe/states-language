@@ -1,4 +1,4 @@
-# States Language
+# Amazon States Language in Java
 
 A Java model, builder API, and validator for the [Amazon States Language](https://states-language.net/spec.html) —
 the JSON language behind AWS Step Functions — targeting the **JSONata dialect** introduced in the
